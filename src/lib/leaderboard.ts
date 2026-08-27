@@ -14,10 +14,11 @@ export const GAME_NAMES: Record<string, string> = {
   fastmath: "Fast Math",
   memory: "Memory Match",
   snake: "Math Snake",
-  bingo: "Number Bingo",
+  pvp: "Monster PvP",
   fractions: "Fraction Feast",
   runner: "Math Runner",
   truefalse: "True or False",
+  maze: "Maths Maze",
 };
 
 export function submitScore(gameId: string, score: number): boolean {

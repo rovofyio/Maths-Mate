@@ -9,7 +9,7 @@ import { BalloonPopGame } from "../games/BalloonPopGame";
 import { FastMathGame } from "../games/FastMathGame";
 import { MazeGame } from "../games/MazeGame";
 
-import { BingoGame } from "../games/BingoGame";
+import { PvpBattleGame } from "../games/PvpBattleGame";
 import { FractionsGame } from "../games/FractionsGame";
 import { RunnerGame } from "../games/RunnerGame";
 import { TrueFalseGame } from "../games/TrueFalseGame";
@@ -23,7 +23,7 @@ const COMPONENTS: Record<string, (props: { topicId: TopicId; diffId: Difficulty;
   fastmath: FastMathGame,
   maze: MazeGame,
 
-  bingo: BingoGame,
+  pvp: PvpBattleGame,
   fractions: FractionsGame,
   runner: RunnerGame,
   truefalse: TrueFalseGame,

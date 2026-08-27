@@ -7,7 +7,7 @@ export const GAMES: GameMeta[] = [
   { id: "fastmath", name: "Fast Math", emoji: "⏱️", color: "#f39c12", blurb: "How many questions can you solve in 60 seconds?", ages: [7, 18], free: true, tag: "Race the clock" },
   { id: "maze", name: "Maths Maze", emoji: "🧩", color: "#1abc9c", blurb: "Navigate the maze by answering maths questions.", ages: [6, 15], free: true, tag: "Puzzle · 5 levels" },
 
-  { id: "bingo", name: "Number Bingo", emoji: "🎯", color: "#d63031", blurb: "Solve sums to stamp numbers and make a line.", ages: [6, 12], free: false, tag: "Premium" },
+  { id: "pvp", name: "Monster PvP", emoji: "⚔️", color: "#8e44ad", blurb: "Pokémon-style PvP: maths hits deal 5/2/0 DMG. Calculus, surds & fractions.", ages: [12, 18], free: false, tag: "Premium · PvP" },
   { id: "fractions", name: "Fraction Feast", emoji: "🍕", color: "#e17055", blurb: "Serve the pizza slice that matches the fraction.", ages: [8, 14], free: false, tag: "Premium" },
   { id: "runner", name: "Math Runner", emoji: "🏃", color: "#00cec9", blurb: "Dodge wrong answers on an endless run.", ages: [6, 18], free: false, tag: "Premium" },
   { id: "truefalse", name: "True or False", emoji: "⚖️", color: "#a29bfe", blurb: "Race the clock judging true or false statements.", ages: [7, 18], free: false, tag: "Premium" },
