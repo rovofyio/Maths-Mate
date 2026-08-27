@@ -1218,3 +1218,103 @@ footer {
 .pvp-res-stat { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 10px 6px; display: flex; flex-direction: column; gap: 2px; }
 .pvp-rs-num { font-weight: 900; color: var(--primary); font-size: 0.95rem; }
 .pvp-rs-lab { font-size: 0.68rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── Font visibility boost + Unified dark buttons (both themes) ── */
+:root {
+  --text: #1e1230;
+  --muted: #5b4a7a;
+}
+.page-sub, .maze-select-sub, .pvp-select-sub, .lesson-box .keypoints, .example-steps, .muted {
+  color: #3b2a5e;
+  font-weight: 700;
+}
+.question-panel, .pvp-question-panel, .tf-statement, .snake-question {
+  background: #221e32;
+  border-color: #2f2850;
+  border-bottom-color: #1a1230;
+  color: #f1eaff;
+}
+.question-text, .pvp-q-text, .tf-statement, .snake-q-text {
+  color: #ffffff;
+  font-size: 1.55rem;
+  font-weight: 900;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  -webkit-text-stroke: 0.2px rgba(255,255,255,0.12);
+}
+.pvp-q-topic, .question-streak { color: #e9ddff; }
+.maze-hint-bar, .pvp-dmg-legend, .balloon-hint, .memory-hint { color: #3b2a5e; font-weight: 800; }
+
+/* Unified dark button shell — same dark theme in light & dark, darker on press */
+.answer-btn, .pvp-opt, .chip, .btn-ghost,
+.back-btn, .quit-btn, .tts-btn, .shop-link,
+.dpad-btn, .memory-card, .bingo-cell, .tf-btn,
+.coin-pack, .product-card, .maze-level-card, .pvp-level-card,
+.lesson-card, .pvp-age-input {
+  background: #221e32 !important;
+  color: #f1eaff !important;
+  border-color: #2f2850 !important;
+  border-bottom-color: #1a1230 !important;
+}
+.answer-btn, .pvp-opt { font-size: 1.18rem; font-weight: 900; letter-spacing: -0.01em; }
+.chip, .btn-ghost, .back-btn, .quit-btn, .tts-btn, .shop-link { font-weight: 900; }
+
+.answer-btn:hover, .pvp-opt:hover, .chip:hover, .btn-ghost:hover,
+.back-btn:hover, .quit-btn:hover, .tts-btn:hover, .shop-link:hover,
+.dpad-btn:hover, .memory-card:hover, .tf-btn:hover,
+.maze-level-card:hover, .pvp-level-card:hover {
+  background: #2a2342 !important;
+  border-color: #3b2e6b !important;
+  border-bottom-color: #2f2850 !important;
+  color: #ffffff !important;
+  filter: none;
+}
+.answer-btn:active, .pvp-opt:active, .chip:active, .btn-ghost:active,
+.back-btn:active, .quit-btn:active, .tts-btn:active, .shop-link:active,
+.dpad-btn:active, .memory-card:active, .tf-btn:active,
+.maze-level-card:active, .pvp-level-card:active, .product-card:active, .coin-pack:active {
+  background: #16121f !important;
+  border-color: #0f0a1e !important;
+  border-bottom-color: #0f0a1e !important;
+  color: #ffffff !important;
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.45);
+}
+.chip.active, .segment.active {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary-dark) !important;
+}
+.chip.active:active { background: #4a0072 !important; }
+.answer-btn.correct { background: #2a2342 !important; border-color: var(--primary) !important; color: #e9d5ff !important; }
+.answer-btn.wrong { background: #2f1a1a !important; border-color: #7a1f1f !important; color: #ffd1d1 !important; }
+.pvp-opt:disabled { opacity: 0.55; }
+
+/* Text inside dark cards — make light for visibility */
+.maze-level-card .mlc-name, .pvp-level-card .pvp-lv-title, .lesson-card .lesson-title,
+.pvp-level-card .pvp-lv-vs, .lesson-card .lesson-meta { color: #f1eaff !important; }
+.maze-level-card .mlc-sub, .pvp-level-card .pvp-lv-sub, .pvp-level-card .pvp-lv-blurb,
+.chapter-body p, .game-body p { color: #cbb8ff !important; }
+.maze-level-card .mlc-badge { background: #2a2342 !important; color: #f1eaff !important; border-color: #3b2e6b !important; }
+.pvp-level-card .pvp-lv-tag { color: #f1eaff !important; }
+
+/* Completed / owned states stay light purple for distinction */
+.maze-level-card.done, .lesson-card.done, .product-card.owned {
+  background: #f3e5f5 !important;
+  border-color: #ab47bc !important;
+  border-bottom-color: #7b1fa2 !important;
+  color: var(--text) !important;
+}
+.maze-level-card.done .mlc-name, .lesson-card.done .lesson-title { color: #4a0072 !important; }
+.maze-level-card.done .mlc-sub, .lesson-card.done .mlc-sub { color: #7b1fa2 !important; }
+.maze-level-card.done .mlc-badge.done { background: var(--primary) !important; color: #fff !important; border-color: var(--primary-dark) !important; }
+.product-card.owned .product-name { color: #4a0072 !important; }
+.product-card.owned .product-blurb { color: #7b1fa2 !important; }
+
+/* Keep dark theme consistent — no double override needed, but ensure pressed stays darker */
+[data-theme="dark"] .answer-btn:active,
+[data-theme="dark"] .pvp-opt:active,
+[data-theme="dark"] .chip:active,
+[data-theme="dark"] .btn-ghost:active,
+[data-theme="dark"] .back-btn:active { background: #0f0a1e !important; }
