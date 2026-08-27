@@ -1415,3 +1415,109 @@ footer {
 [data-theme="dark"] .maze-level-card.done .mlc-name,
 [data-theme="dark"] .lesson-card.done .lesson-title { color: #ffffff !important; }
 [data-theme="dark"] .maze-level-card.done .mlc-sub { color: #e9ddff !important; }
+
+/* ── Learn: Quizlet flashcards + Duolingo quiz ── */
+.lesson-overview { display: flex; flex-direction: column; gap: 12px; }
+.lesson-start-card {
+  background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: var(--radius);
+  padding: 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.lesson-start-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.lss { background: var(--bg); border: 2px solid var(--border); border-radius: 999px; padding: 6px 10px; font-size: 0.78rem; font-weight: 800; }
+.lesson-done-badge { background: #f3e5f5; border: 2px solid #e1bee7; color: #4a0072; padding: 8px 12px; border-radius: 999px; font-weight: 800; font-size: 0.85rem; text-align: center; }
+.lesson-done-card {
+  max-width: 420px; margin: 16px auto; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: var(--radius);
+  padding: 24px; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center;
+}
+.lesson-done-emoji { font-size: 2.8rem; width: 76px; height: 76px; display: grid; place-items: center; background: var(--primary-light); border: 2px solid var(--border-strong); border-bottom-width: 4px; border-radius: 20px; }
+.lesson-done-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+/* Flashcards - Quizlet */
+.fc-wrap { display: flex; flex-direction: column; gap: 12px; max-width: 520px; margin: 0 auto; width: 100%; }
+.fc-top { display: flex; align-items: center; gap: 10px; }
+.fc-progress { flex: 1; height: 10px; background: var(--border); border-radius: 999px; overflow: hidden; border: 2px solid var(--border); }
+.fc-progress-fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width 0.3s; }
+.fc-counter { font-weight: 900; font-size: 0.85rem; min-width: 52px; text-align: right; }
+.flashcard {
+  height: 220px; perspective: 900px; cursor: pointer;
+}
+.flashcard-inner {
+  position: relative; width: 100%; height: 100%; transition: transform 0.45s cubic-bezier(0.22,1,0.36,1); transform-style: preserve-3d;
+  border-radius: var(--radius); 
+}
+.flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+.flashcard-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: var(--radius);
+  padding: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;
+}
+.flashcard-face.back { transform: rotateY(180deg); background: #221e32; color: #fff; border-color: #2f2850; }
+.flashcard-face.front .fc-front-text { font-size: 1.15rem; font-weight: 900; color: #000; line-height: 1.4; }
+.flashcard-face.back .fc-back-text { font-size: 1.05rem; font-weight: 800; line-height: 1.45; }
+.fc-hint { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--bg); padding: 4px 8px; border-radius: 999px; border: 2px solid var(--border); }
+.flashcard-face.back .fc-hint, .flashcard-face.back .fc-back-hint { color: #e9ddff; }
+.fc-back-hint { font-size: 0.78rem; color: #cbb8ff; font-weight: 600; margin-top: 6px; }
+.fc-tap { font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-top: 4px; }
+.flashcard-face.back .fc-tap { color: #a99bc6; }
+.fc-actions { display: flex; gap: 8px; }
+.fc-actions .btn-ghost { flex: 1; }
+.fc-know { flex: 1; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 12px; padding: 10px; font-weight: 900; cursor: pointer; }
+.fc-know.known { background: #f3e5f5; border-color: #ab47bc; color: #4a0072; }
+.fc-dots { display: flex; gap: 6px; justify-content: center; }
+.fc-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border); background: #fff; cursor: pointer; padding: 0; }
+.fc-dot.active { background: var(--primary); border-color: var(--primary-dark); transform: scale(1.2); }
+.fc-dot.known { border-color: #ab47bc; background: #e1bee7; }
+.fc-foot { display: flex; flex-direction: column; gap: 8px; text-align: center; }
+
+/* Duolingo quiz */
+.duo-wrap { display: flex; flex-direction: column; gap: 14px; max-width: 520px; margin: 0 auto; width: 100%; }
+.duo-top { display: flex; align-items: center; gap: 10px; }
+.duo-close { width: 36px; height: 36px; border-radius: 10px; border: 2px solid var(--border); border-bottom-width: 4px; background: #fff; font-weight: 900; cursor: pointer; }
+.duo-progress { flex: 1; height: 12px; background: var(--border); border-radius: 999px; overflow: hidden; border: 2px solid var(--border); }
+.duo-progress-fill { height: 100%; background: #58cc02; border-radius: 999px; transition: width 0.35s; }
+.duo-hearts { display: flex; gap: 2px; font-size: 1.1rem; }
+.heart.alive { filter: none; } .heart.dead { opacity: 0.35; }
+.duo-question { display: flex; gap: 10px; align-items: flex-start; }
+.duo-character { font-size: 2.2rem; width: 56px; height: 56px; display: grid; place-items: center; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 16px; flex-shrink: 0; }
+.duo-bubble {
+  flex: 1; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 18px; padding: 14px; position: relative;
+}
+.duo-bubble::before { content: ""; position: absolute; left: -8px; top: 18px; width: 14px; height: 14px; background: #fff; border-left: 2px solid var(--border); border-bottom: 2px solid var(--border); transform: rotate(45deg); }
+.duo-prompt { font-size: 1.1rem; font-weight: 900; line-height: 1.4; color: #000; }
+.duo-explain { margin-top: 8px; font-size: 0.85rem; color: #3b2a5e; font-weight: 600; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; padding: 8px; }
+.duo-options { display: grid; gap: 8px; }
+.duo-opt {
+  background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 14px;
+  padding: 14px; font-size: 1rem; font-weight: 800; text-align: left; cursor: pointer; color: #000;
+}
+.duo-opt.selected { border-color: #58cc02; background: #e8f5d8; color: #000; }
+.duo-opt.correct { border-color: #58cc02; background: #d7ffb8; color: #1a5c00; }
+.duo-opt.wrong { border-color: #ff4b4b; background: #ffe5e5; color: #7f1d1d; }
+.duo-feedback { display: flex; gap: 10px; align-items: center; padding: 12px; border-radius: 14px; border: 2px solid; border-bottom-width: 4px; }
+.duo-feedback.ok { background: #e8f5d8; border-color: #58cc02; color: #1a5c00; }
+.duo-feedback.bad { background: #ffe5e5; border-color: #ff4b4b; color: #7f1d1d; }
+.duo-feedback-icon { font-size: 1.4rem; }
+.duo-feedback-title { font-weight: 900; }
+.duo-feedback-sub { font-size: 0.82rem; font-weight: 600; opacity: 0.85; }
+.duo-continue.ok { background: #58cc02; border-color: #3a8a00; }
+.duo-continue.bad { background: #ff4b4b; border-color: #c51d1d; }
+.duo-foot { text-align: center; }
+.duo-result { background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: var(--radius); padding: 18px; text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.duo-res-emoji { font-size: 2.4rem; }
+
+/* Dark mode for learn */
+[data-theme="dark"] .lesson-start-card,
+[data-theme="dark"] .lesson-done-card,
+[data-theme="dark"] .duo-bubble,
+[data-theme="dark"] .duo-result,
+[data-theme="dark"] .duo-character { background: #221e32; border-color: #2f2850; color: #fff; }
+[data-theme="dark"] .duo-bubble::before { background: #221e32; border-color: #2f2850; }
+[data-theme="dark"] .duo-prompt { color: #fff; }
+[data-theme="dark"] .duo-explain { background: #2a2342; border-color: #3b2e6b; color: #e9ddff; }
+[data-theme="dark"] .duo-opt { background: #221e32; border-color: #2f2850; color: #fff; }
+[data-theme="dark"] .duo-opt.selected { background: #2a2342; border-color: #58cc02; }
+[data-theme="dark"] .flashcard-face.front { background: #221e32; border-color: #2f2850; }
+[data-theme="dark"] .flashcard-face.front .fc-front-text { color: #fff; }
+[data-theme="dark"] .flashcard-face.back { background: #1a1730; }
+[data-theme="dark"] .lss { background: #221e32; border-color: #2f2850; color: #fff; }
+[data-theme="dark"] .lesson-done-badge { background: #2a2342; border-color: #3b2e6b; color: #e9ddff; }
