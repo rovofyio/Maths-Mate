@@ -739,8 +739,8 @@ footer {
 [data-theme="dark"] {
   --bg: #16121f;
   --card: #221e32;
-  --text: #f1eaff;
-  --muted: #a99bc6;
+  --text: #ffffff;
+  --muted: #ffffff;
   --border: #2f2850;
   --border-strong: #3b2e6b;
   --primary-light: #2a2342;
@@ -1513,11 +1513,67 @@ footer {
 [data-theme="dark"] .duo-character { background: #221e32; border-color: #2f2850; color: #fff; }
 [data-theme="dark"] .duo-bubble::before { background: #221e32; border-color: #2f2850; }
 [data-theme="dark"] .duo-prompt { color: #fff; }
-[data-theme="dark"] .duo-explain { background: #2a2342; border-color: #3b2e6b; color: #e9ddff; }
+[data-theme="dark"] .duo-explain { background: #2a2342; border-color: #3b2e6b; color: #ffffff; }
 [data-theme="dark"] .duo-opt { background: #221e32; border-color: #2f2850; color: #fff; }
 [data-theme="dark"] .duo-opt.selected { background: #2a2342; border-color: #58cc02; }
 [data-theme="dark"] .flashcard-face.front { background: #221e32; border-color: #2f2850; }
 [data-theme="dark"] .flashcard-face.front .fc-front-text { color: #fff; }
 [data-theme="dark"] .flashcard-face.back { background: #1a1730; }
 [data-theme="dark"] .lss { background: #221e32; border-color: #2f2850; color: #fff; }
-[data-theme="dark"] .lesson-done-badge { background: #2a2342; border-color: #3b2e6b; color: #e9ddff; }
+[data-theme="dark"] .lesson-done-badge { background: #2a2342; border-color: #3b2e6b; color: #ffffff; }
+
+/* ── Global dark mode: force white font everywhere (home + games) ── */
+[data-theme="dark"] .page-title,
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .level-card-head,
+[data-theme="dark"] .level-card-foot,
+[data-theme="dark"] .profile-name,
+[data-theme="dark"] .profile-level,
+[data-theme="dark"] .stat-num,
+[data-theme="dark"] .stat-label,
+[data-theme="dark"] .topic-stat-name,
+[data-theme="dark"] .topic-stat-val,
+[data-theme="dark"] .achievement-name,
+[data-theme="dark"] .lb-game,
+[data-theme="dark"] .lb-score,
+[data-theme="dark"] .lb-total-num,
+[data-theme="dark"] .setting-name,
+[data-theme="dark"] .chapter-body h3,
+[data-theme="dark"] .game-body h3,
+[data-theme="dark"] .lesson-title,
+[data-theme="dark"] .mlc-name,
+[data-theme="dark"] .pvp-lv-title { color: #ffffff !important; }
+
+[data-theme="dark"] .page-sub,
+[data-theme="dark"] .maze-select-sub,
+[data-theme="dark"] .pvp-select-sub,
+[data-theme="dark"] .lesson-box .keypoints,
+[data-theme="dark"] .lesson-box .keypoints li,
+[data-theme="dark"] .example-steps,
+[data-theme="dark"] .example-steps li,
+[data-theme="dark"] .example-q,
+[data-theme="dark"] .example-a,
+[data-theme="dark"] .keypoints,
+[data-theme="dark"] .muted,
+[data-theme="dark"] .chapter-body p,
+[data-theme="dark"] .game-body p,
+[data-theme="dark"] .game-tag,
+[data-theme="dark"] .chapter-meta,
+[data-theme="dark"] .lesson-card .lesson-title,
+[data-theme="dark"] .maze-level-card .mlc-sub,
+[data-theme="dark"] .pvp-level-card .pvp-lv-sub,
+[data-theme="dark"] .pvp-level-card .pvp-lv-blurb,
+[data-theme="dark"] .pvp-level-card .pvp-lv-vs,
+[data-theme="dark"] .achievement-desc,
+[data-theme="dark"] .setting-desc,
+[data-theme="dark"] .profile-coins,
+[data-theme="dark"] .lb-total-label,
+[data-theme="dark"] .games-tip,
+[data-theme="dark"] .banner-slot { color: #ffffff !important; }
+
+[data-theme="dark"] .game-card,
+[data-theme="dark"] .chapter-card { color: #ffffff; }
+[data-theme="dark"] .game-card .game-body h3,
+[data-theme="dark"] .chapter-card .chapter-body h3,
+[data-theme="dark"] .game-card .game-body p,
+[data-theme="dark"] .chapter-card .chapter-body p { color: #ffffff !important; }
