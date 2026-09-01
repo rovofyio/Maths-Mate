@@ -520,14 +520,25 @@ footer {
 .player-bar { background: #2ecc71; height: 100%; border-radius: 999px; transition: width 0.2s; }
 
 /* ── Runner ── */
-.runner-stage { position: relative; height: 140px; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: var(--radius); overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 18px; }
-.runner-ground { position: absolute; bottom: 0; left: 0; right: 0; height: 18px; background: var(--primary); border-top: 2px solid var(--primary-dark); }
-.runner { font-size: 2rem; position: relative; z-index: 1; }
-.jump-word { position: absolute; top: 18px; color: var(--primary); font-weight: 900; animation: floatUp 0.6s ease; }
-.trip-word { position: absolute; top: 18px; font-size: 1.6rem; animation: shake 0.4s ease; }
+.runner-stage { position: relative; height: 140px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 18px; border-radius: var(--radius); border: 2px solid var(--border); border-bottom-width: 4px; }
+.runner-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #e8f4fd 0%, #fdf7ff 55%, #f3e5f5 100%); z-index: 0; }
+.ground-dashes { position: absolute; bottom: 18px; left: 0; right: 0; height: 4px; background: repeating-linear-gradient(90deg, rgba(123,31,162,0.25) 0, rgba(123,31,162,0.25) 10px, transparent 10px, transparent 20px); animation: groundDash 0.35s linear infinite; z-index: 1; }
+.obstacle { position: absolute; bottom: 28px; right: -50px; width: 32px; height: 44px; background: linear-gradient(180deg, #e17055, #c0392b); border: 2px solid #922b21; border-bottom-width: 4px; border-radius: 6px; z-index: 2; animation: obstacleScroll 2.5s linear forwards; }
+.runner { font-size: 2.6rem; position: relative; z-index: 3; transform-origin: center bottom; will-change: transform; backface-visibility: hidden; }
+.runner.running { animation: run 0.32s ease-in-out infinite; }
+.runner.jump { animation: jumpAnim 0.6s ease-in-out; }
+.runner.trip { animation: tripAnim 0.6s ease-in-out; }
+@keyframes run { 0% { transform: translateY(0) rotate(-2deg); } 25% { transform: translateY(-12px) rotate(0deg); } 50% { transform: translateY(0) rotate(2deg); } 75% { transform: translateY(-12px) rotate(0deg); } 100% { transform: translateY(0) rotate(-2deg); } }
+@keyframes jumpAnim { 0% { transform: translateY(0) scale(1); } 10% { transform: translateY(-30px) scale(1.12, 0.88); } 30% { transform: translateY(-85px) scale(1.18, 0.82); } 50% { transform: translateY(-85px) scale(1.1, 0.9); } 70% { transform: translateY(-30px) scale(1.05, 0.95); } 90% { transform: translateY(0) scale(1); } 100% { transform: translateY(0) scale(1); } }
+@keyframes tripAnim { 0% { transform: translateX(0) rotate(0deg); } 15% { transform: translateX(18px) rotate(-10deg); } 30% { transform: translateX(-12px) rotate(8deg); } 45% { transform: translateX(10px) rotate(-5deg); } 60% { transform: translateX(-6px) rotate(4deg); } 75% { transform: translateX(4px) rotate(-2deg); } 100% { transform: translateX(0) rotate(0deg); } }
+@keyframes obstacleScroll { from { right: -50px; } to { right: calc(100% + 60px); } }
+@keyframes groundDash { from { background-position: 0 0; } to { background-position: -20px 0; } }
+.runner-ground { position: absolute; bottom: 0; left: 0; right: 0; height: 18px; background: var(--primary); border-top: 2px solid var(--primary-dark); z-index: 2; }
+.jump-word { position: absolute; top: 10px; left: 50%; color: var(--primary); font-weight: 900; animation: floatUp 0.6s ease; z-index: 5; white-space: nowrap; }
+.trip-word { position: absolute; top: 10px; left: 50%; font-size: 1.6rem; animation: shake 0.4s ease; z-index: 5; }
 .runner-score { text-align: center; font-weight: 900; }
-@keyframes floatUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-22px); opacity: 0; } }
-@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+@keyframes floatUp { from { transform: translateX(-50%) translateY(0); opacity: 1; } to { transform: translateX(-50%) translateY(-24px); opacity: 0; } }
+@keyframes shake { 0%,100%{transform:translateX(-50%) translateX(0)} 25%{transform:translateX(-50%) translateX(-5px)} 75%{transform:translateX(-50%) translateX(5px)} }
 
 /* ── Tower ── */
 .tower-top { display: flex; justify-content: space-between; font-weight: 900; font-size: 0.9rem; }
@@ -782,6 +793,9 @@ footer {
   background: #221e32;
   border-color: #2f2850;
   color: var(--text);
+}
+[data-theme="dark"] .runner-sky {
+  background: linear-gradient(180deg, #1a1530 0%, #16121f 55%, #221e32 100%);
 }
 [data-theme="dark"] .game-art,
 [data-theme="dark"] .chapter-emoji,
@@ -1167,9 +1181,13 @@ footer {
 .pvp-dot.perfect { background: var(--primary); } .pvp-dot.close { background: #f39c12; } .pvp-dot.miss { background: var(--danger); }
 
 .pvp-arena { display: flex; flex-direction: column; gap: 12px; max-width: 520px; margin: 0 auto; width: 100%; }
-.pvp-combatant { background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; transition: transform 0.15s; }
+.pvp-combatant { background: #fff; border: 2px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; transition: transform 0.15s; }
 .pvp-combatant.shake { animation: pvp-shake 0.38s ease; }
 @keyframes pvp-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes pvp-breathe { 0%,100%{transform:scaleY(1) translateY(0)} 50%{transform:scaleY(1.04) translateY(-3px)} }
+@keyframes pvp-attack { 0%{transform:scale(1) translateX(0)} 20%{transform:scale(1.18) translateX(18px)} 45%{transform:scale(0.92) translateX(-6px)} 70%{transform:scale(1.06) translateX(4px)} 90%{transform:scale(0.97) translateX(-1px)} 100%{transform:scale(1) translateX(0)} }
+.pvp-sprite-emoji { width: 7rem; height: 7rem; object-fit: contain; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.12)); animation: pvp-breathe 1s ease-in-out infinite; }
+.pvp-sprite-attack { animation: pvp-attack 0.8s ease-out forwards; }
 .pvp-combatant-head { display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 0.88rem; }
 .pvp-combatant-name { display: inline-flex; align-items: center; gap: 6px; }
 .pvp-lv-badge { background: #fff; border: 2px solid var(--border); border-bottom-width: 3px; padding: 3px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 900; color: var(--muted); }
@@ -1180,10 +1198,8 @@ footer {
 .pvp-hp-fill.enemy { background: var(--danger); }
 .pvp-hp-fill.player { background: #27ae60; }
 .pvp-hp-num { font-size: 0.78rem; font-weight: 900; color: var(--muted); min-width: 52px; text-align: right; }
-.pvp-sprite { position: relative; height: 110px; border-radius: var(--radius-sm); border: 2px solid; border-bottom-width: 4px; display: grid; place-items: center; overflow: hidden; }
-.pvp-sprite.enemy { background: #fff; }
-.pvp-sprite.player { background: var(--primary-light); }
-.pvp-sprite-emoji { font-size: 3rem; filter: drop-shadow(0 3px 0 rgba(0,0,0,0.08)); }
+.pvp-sprite { position: relative; height: 180px; display: grid; place-items: center; overflow: visible; }
+.pvp-sprite-emoji { width: 7rem; height: 7rem; object-fit: contain; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.12)); animation: pvp-breathe 1s ease-in-out infinite; }
 .pvp-dmg-pop { position: absolute; top: 14px; right: 16px; font-weight: 900; font-size: 1.35rem; padding: 4px 10px; border-radius: 999px; border: 2px solid; border-bottom-width: 3px; animation: pvp-pop 0.7s ease forwards; }
 .pvp-dmg-pop.perfect { background: var(--primary); color: #fff; border-color: var(--primary-dark); }
 .pvp-dmg-pop.close { background: #f39c12; color: #fff; border-color: #e67e22; }
@@ -1191,7 +1207,6 @@ footer {
 .pvp-dmg-pop.player { background: var(--danger); color: #fff; border-color: var(--danger-dark); top: 10px; left: 16px; right: auto; }
 .pvp-crit { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: var(--primary-dark); color: #fff; font-size: 0.68rem; font-weight: 900; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.07em; animation: pvp-pop 0.7s ease; }
 @keyframes pvp-pop { 0%{transform: translateY(10px) scale(0.7); opacity:0} 20%{transform: translateY(0) scale(1.1); opacity:1} 80%{transform: translateY(-2px) scale(1); opacity:1} 100%{transform: translateY(-12px) scale(0.9); opacity:0} }
-.pvp-vs { text-align: center; font-weight: 900; font-size: 0.82rem; color: var(--muted); letter-spacing: 0.14em; }
 .pvp-flash { text-align: center; font-weight: 900; padding: 10px; border-radius: var(--radius-sm); border: 2px solid; border-bottom-width: 4px; animation: maze-fade-in 0.2s ease; font-size: 0.92rem; }
 .pvp-flash.perfect { background: var(--primary); color: #fff; border-color: var(--primary-dark); }
 .pvp-flash.close { background: #fef9e7; color: #b7950b; border-color: #f9e79f; }

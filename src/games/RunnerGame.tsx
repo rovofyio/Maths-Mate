@@ -6,21 +6,26 @@ import { getTopic, DIFFICULTIES, makeQuestion } from "../lib/questions";
 import type { Difficulty, Question, TopicId } from "../types";
 
 const GAME_SECONDS = 60;
+const OBSTACLE_INTERVAL = 2500;
 
 export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void }) {
   const [question, setQuestion] = useState<Question>(() => makeQuestion(topicId, diffId));
   const [timeLeft, setTimeLeft] = useState(GAME_SECONDS);
   const [anim, setAnim] = useState<"" | "jump" | "trip">("");
+  const [obstacles, setObstacles] = useState<number[]>([]);
   const statsRef = useRef({ correct: 0, total: 0, bestStreak: 0 });
   const streakRef = useRef(0);
   const overRef = useRef(false);
   const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const obstacleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const obstacleIdRef = useRef(0);
 
   const topic = getTopic(topicId);
 
   const finish = (won: boolean) => {
     if (overRef.current) return;
     overRef.current = true;
+    if (obstacleTimer.current) clearInterval(obstacleTimer.current);
     const s = statsRef.current;
     const score = s.correct * 10 - (s.total - s.correct) * 5;
     const reward = buildReward({ won, correct: s.correct, diffId });
@@ -50,6 +55,28 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    obstacleTimer.current = setInterval(() => {
+      const id = obstacleIdRef.current++;
+      setObstacles((prev) => {
+        if (prev.length >= 5) return prev;
+        return [...prev, id];
+      });
+      setTimeout(() => {
+        setObstacles((prev) => prev.filter((o) => o !== id));
+      }, OBSTACLE_INTERVAL);
+    }, OBSTACLE_INTERVAL);
+    return () => {
+      if (obstacleTimer.current) clearInterval(obstacleTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (animTimer.current) clearTimeout(animTimer.current);
+    };
+  }, []);
+
   const handleAnswer = (correct: boolean) => {
     if (overRef.current) return;
     const s = statsRef.current;
@@ -64,7 +91,7 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
       streakRef.current = 0;
       setAnim("trip");
     }
-    animTimer.current = setTimeout(() => setAnim(""), 650);
+    animTimer.current = setTimeout(() => setAnim(""), 700);
     setQuestion(makeQuestion(topicId, diffId));
   };
 
@@ -76,7 +103,12 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
       onQuit={() => finish(false)}
     >
       <div className="runner-stage">
-        <div className={`runner ${anim}`}>🏃</div>
+        <div className="runner-sky" />
+        <div className="ground-dashes" />
+        {obstacles.map((id) => (
+          <div key={id} className="obstacle" />
+        ))}
+        <div className={`runner ${anim || "running"}`}>🏃</div>
         <div className="runner-ground" />
         {anim === "jump" && <div className="jump-word">✅ +10</div>}
         {anim === "trip" && <div className="trip-word">💥</div>}

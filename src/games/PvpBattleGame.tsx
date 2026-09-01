@@ -1,9 +1,13 @@
-import { useRef, useState } from "preact/hooks";
+import { useRef, useState, useEffect } from "preact/hooks";
 import { GameShell } from "../components/GameShell";
 import { buildReward, type ResultInput } from "./helpers";
 import { recordAnswer } from "../lib/store";
 import { evaluateAfterAnswer } from "../lib/achievements";
 import type { Difficulty, TopicId } from "../types";
+import slimeUrl from "../../Pictures/Slime monster.png";
+import wizardUrl from "../../Pictures/Wizard.png";
+import wizard1Url from "../../Pictures/Wizard1.png";
+import wizard2Url from "../../Pictures/Wizard2.png";
 
 /* ── helpers ── */
 const ri = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -239,7 +243,7 @@ const LEVELS: LevelCfg[] = [
     emoji: "🍕",
     topics: "fractions / decimals",
     diff: "easy",
-    enemy: { name: "Slime King", emoji: "🟢", hp: 50, dmg: 4, color: "#27ae60", bg: "#2ecc71" },
+    enemy: { name: "Slime King", emoji: "💚", hp: 50, dmg: 4, color: "#27ae60", bg: "#2ecc71" },
     blurb: "Tame the slime with pizza slices and decimal hits.",
   },
   {
@@ -320,6 +324,14 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
   const [playerShake, setPlayerShake] = useState(false);
   const [dmgPopEnemy, setDmgPopEnemy] = useState<number | null>(null);
   const [dmgPopPlayer, setDmgPopPlayer] = useState<number | null>(null);
+  const [isAttacking, setIsAttacking] = useState(false);
+  const [idleFrame, setIdleFrame] = useState(0);
+
+  useEffect(() => {
+    if (isAttacking) return;
+    const id = setInterval(() => setIdleFrame(f => (f + 1) % 2), 500);
+    return () => clearInterval(id);
+  }, [isAttacking]);
 
   const statsRef = useRef({ correct: 0, total: 0, bestStreak: 0, streak: 0 });
   const roundsRef = useRef(0);
@@ -386,6 +398,12 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
     } else {
       // close counts as not correct but not streak breaker? slight streak preservation
       statsRef.current.streak = Math.max(0, statsRef.current.streak - 1);
+    }
+
+    // animate player attack
+    if (isCorrect || isClose) {
+      setIsAttacking(true);
+      setTimeout(() => setIsAttacking(false), 800);
     }
 
     // animate player attack
@@ -588,19 +606,21 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
             <div className="pvp-hp-bar"><div className="pvp-hp-fill enemy" style={{ width: `${enemyPct}%` }} /></div>
             <span className="pvp-hp-num">{enemyHP}/{selected.enemy.hp}</span>
           </div>
-          <div className="pvp-sprite enemy" style={{ background: `${selected.enemy.color}14`, borderColor: `${selected.enemy.color}30` }}>
-            <span className="pvp-sprite-emoji">{selected.enemy.emoji}</span>
+          <div className="pvp-sprite enemy">
+            <img src={slimeUrl} className="pvp-sprite-emoji" alt={selected.enemy.name} draggable={false} />
             {dmgPopEnemy !== null && <span className={`pvp-dmg-pop ${dmgPopEnemy === 5 ? "perfect" : dmgPopEnemy===2 ? "close" : "miss"}`}>-{dmgPopEnemy}</span>}
             {flash && flash.pDmg === 5 && <span className="pvp-crit">CRITICAL!</span>}
           </div>
         </div>
 
-        <div className="pvp-vs">⚔️ VS ⚔️</div>
-
         {/* Player */}
         <div className={`pvp-combatant player ${playerShake ? "shake" : ""}`}>
-          <div className="pvp-sprite player" style={{ background: "var(--primary-light)", borderColor: "var(--border-strong)" }}>
-            <span className="pvp-sprite-emoji">🧙</span>
+          <div className="pvp-sprite player">
+            {isAttacking ? (
+              <img src={wizard2Url} className="pvp-sprite-emoji pvp-sprite-attack" alt="Wizard attacking" draggable={false} />
+            ) : (
+              <img src={idleFrame === 0 ? wizardUrl : wizard1Url} className="pvp-sprite-emoji" alt="Wizard" draggable={false} />
+            )}
             {dmgPopPlayer !== null && <span className="pvp-dmg-pop player">-{dmgPopPlayer}</span>}
           </div>
           <div className="pvp-combatant-head">
