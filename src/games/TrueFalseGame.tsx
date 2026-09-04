@@ -21,6 +21,7 @@ export function TrueFalseGame({ topicId, diffId, onFinish }: { topicId: TopicId;
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState<null | boolean>(null);
+  const [feedback, setFeedback] = useState<"correct" | "false" | null>(null);
   const streakRef = useRef(0);
   const statsRef = useRef({ correct: 0, total: 0, bestStreak: 0 });
   const overRef = useRef(false);
@@ -46,6 +47,7 @@ export function TrueFalseGame({ topicId, diffId, onFinish }: { topicId: TopicId;
     if (picked !== null) return;
     setPicked(guess);
     const correct = guess === q.truthy;
+    setFeedback(correct ? "correct" : "false");
     recordAnswer("mixed", correct);
     evaluateAfterAnswer(correct);
     const s = statsRef.current;
@@ -74,17 +76,21 @@ export function TrueFalseGame({ topicId, diffId, onFinish }: { topicId: TopicId;
         truthy,
       });
       setPicked(null);
-    }, 700);
+      setFeedback(null);
+    }, 1000);
   };
 
   return (
     <GameShell
       emoji="⚖️"
       name="True or False"
+      className={feedback ? `tf-feedback-${feedback}` : ""}
       pills={[`${topic.emoji} ${topic.name}`, `${DIFFICULTIES[diffId].name}`, `${index + 1}/${TOTAL}`]}
       onQuit={() => finish(false)}
     >
-      <div className="tf-statement">{q.statement}</div>
+      <div className={`tf-game-area ${feedback ? `tf-feedback-${feedback}` : ""}`}>
+        <div className="tf-feedback-text" aria-live="polite">{feedback === "correct" ? "CORRECT" : feedback === "false" ? "FALSE" : ""}</div>
+        <div className="tf-statement">{q.statement}</div>
       <div className="tf-buttons">
         <button className={`tf-btn true ${picked === true ? (q.truthy ? "correct" : "wrong") : ""}`} onClick={() => answer(true)}>
           ✅ True
@@ -93,7 +99,8 @@ export function TrueFalseGame({ topicId, diffId, onFinish }: { topicId: TopicId;
           ❌ False
         </button>
       </div>
-      <p className="balloon-hint">⚖️ Score: {score}/15 {streakRef.current > 1 ? `· 🔥 streak ${streakRef.current}` : ""}</p>
+        <p className="balloon-hint">⚖️ Score: {score}/15 {streakRef.current > 1 ? `· 🔥 streak ${streakRef.current}` : ""}</p>
+      </div>
     </GameShell>
   );
 }

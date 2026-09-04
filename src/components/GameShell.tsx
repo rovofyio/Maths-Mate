@@ -6,18 +6,20 @@ export function GameShell({
   name,
   pills = [],
   onQuit,
+  className = "",
   children,
 }: {
   emoji: string;
   name: string;
   pills?: string[];
   onQuit: () => void;
+  className?: string;
   children: ComponentChildren;
 }) {
   const [paused, setPaused] = useState(false);
 
   return (
-    <div className="game-screen">
+    <div className={`game-screen ${className}`.trim()}>
       <div className="game-hud">
         <button className="quit-btn" aria-label="Pause game" onClick={() => setPaused(true)}>
           ←
