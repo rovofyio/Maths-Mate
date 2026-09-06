@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { shouldAdGate, showInterstitial } from "../lib/ads";
+import { showInterstitial } from "../lib/ads";
 import { recordAdSeen } from "../lib/store";
 import { accuracy } from "../games/helpers";
 import type { GameResult } from "../types";
@@ -15,7 +15,7 @@ export function GameResult({
   onReplay: () => void;
   onExit: () => void;
 }) {
-  const [phase, setPhase] = useState<"ad" | "result">(() => (shouldAdGate() ? "ad" : "result"));
+  const [phase, setPhase] = useState<"ad" | "result">("ad");
   const [count, setCount] = useState(3);
 
   useEffect(() => {

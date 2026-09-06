@@ -163,7 +163,7 @@ export function ProfileScreen() {
 
       {tab === "shop" && (
         <div className="shop-intro">
-          <p className="muted">The shop lets you buy coin packs and remove ads with real money — the first 5 games are always free.</p>
+          <p className="muted">The shop lets you buy coin packs and remove ads with real money — all games are always free.</p>
           <button className="btn-primary big" onClick={() => setPaywall(true)}>
             💎 Open the shop
           </button>

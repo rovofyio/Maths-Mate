@@ -6,15 +6,20 @@ import { getTopic, DIFFICULTIES, makeQuestion } from "../lib/questions";
 import type { Difficulty, Question, TopicId } from "../types";
 
 const GAME_SECONDS = 60;
+const OBSTACLE_DURATION = 2400;
+
+type Obstacle = { id: number; hit: boolean };
 
 export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void }) {
   const [question, setQuestion] = useState<Question>(() => makeQuestion(topicId, diffId));
   const [timeLeft, setTimeLeft] = useState(GAME_SECONDS);
   const [anim, setAnim] = useState<"" | "jump" | "trip">("");
+  const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const statsRef = useRef({ correct: 0, total: 0, bestStreak: 0 });
   const streakRef = useRef(0);
   const overRef = useRef(false);
   const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const obstacleIdRef = useRef(0);
 
   const topic = getTopic(topicId);
 
@@ -50,6 +55,12 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (animTimer.current) clearTimeout(animTimer.current);
+    };
+  }, []);
+
   const handleAnswer = (correct: boolean) => {
     if (overRef.current) return;
     const s = statsRef.current;
@@ -64,7 +75,12 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
       streakRef.current = 0;
       setAnim("trip");
     }
-    animTimer.current = setTimeout(() => setAnim(""), 650);
+    const obstacle = { id: obstacleIdRef.current++, hit: !correct };
+    setObstacles((prev) => [...prev, obstacle]);
+    setTimeout(() => {
+      setObstacles((prev) => prev.filter((item) => item.id !== obstacle.id));
+    }, OBSTACLE_DURATION);
+    animTimer.current = setTimeout(() => setAnim(""), correct ? 2400 : 1400);
     setQuestion(makeQuestion(topicId, diffId));
   };
 
@@ -76,7 +92,14 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
       onQuit={() => finish(false)}
     >
       <div className="runner-stage">
-        <div className={`runner ${anim}`}>🏃</div>
+        <div className="runner-sky" />
+        <div className="ground-dashes" />
+        {obstacles.map((obstacle) => (
+          <div key={obstacle.id} className={`obstacle ${obstacle.hit ? "obstacle-hit" : "obstacle-clear"}`} />
+        ))}
+        <div className="runner-facing-right">
+          <div className={`runner ${anim || "running"}`}>🏃</div>
+        </div>
         <div className="runner-ground" />
         {anim === "jump" && <div className="jump-word">✅ +10</div>}
         {anim === "trip" && <div className="trip-word">💥</div>}

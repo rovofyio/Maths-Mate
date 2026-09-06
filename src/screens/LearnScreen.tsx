@@ -11,7 +11,7 @@ type View =
   | { kind: "chapter"; chapterId: string }
   | { kind: "lesson"; chapterId: string; lessonId: string };
 
-type LessonPhase = "overview" | "flashcards" | "quiz" | "done";
+type LessonPhase = "flashcards" | "quiz" | "done";
 
 /* ── Flashcards ── */
 function FlashcardDeck({ lessonId, chapterId, onDone }: { lessonId: string; chapterId: string; onDone: () => void }) {
@@ -79,10 +79,10 @@ function FlashcardDeck({ lessonId, chapterId, onDone }: { lessonId: string; chap
 
       <div className="fc-foot">
         <span className="muted small">{known.size}/{total} marked known • Quizlet style — tap card to flip</span>
-        <button className="btn-primary big" disabled={!flipped && known.size < total && idx !== total - 1} onClick={onDone}>
-          {allSeen || idx === total - 1 ? "Start Duolingo Quiz →" : "Continue flashcards"}
+        <button className="btn-primary big" onClick={() => (allSeen || idx === total - 1 ? onDone() : next())}>
+          {allSeen || idx === total - 1 ? "Go to Quiz →" : "Next Card →"}
         </button>
-        {!allSeen && <span className="muted small">Tip: flip each card and mark known to unlock quiz faster</span>}
+        {!allSeen && idx !== total - 1 && <span className="muted small">Tip: flip each card and mark known to unlock quiz faster</span>}
       </div>
     </div>
   );
@@ -192,7 +192,7 @@ function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; cha
 
 export function LearnScreen() {
   const [view, setView] = useState<View>({ kind: "home" });
-  const [phase, setPhase] = useState<LessonPhase>("overview");
+  const [phase, setPhase] = useState<LessonPhase>("flashcards");
   const s = state.value;
 
   if (view.kind === "lesson") {
@@ -209,7 +209,7 @@ export function LearnScreen() {
     if (phase === "flashcards") {
       return (
         <div className="page">
-          <button className="back-btn" onClick={() => setPhase("overview")}>← Back to lesson</button>
+          <button className="back-btn" onClick={() => setView({ kind: "chapter", chapterId: chapter.id })}>← Back to {chapter.title}</button>
           <h1 className="page-title">🃏 Flashcards — {lesson.title}</h1>
           <p className="page-sub">Quizlet style: tap to flip, mark known, swipe through {flashcards.length} cards.</p>
           <FlashcardDeck lessonId={lesson.id} chapterId={chapter.id} onDone={() => setPhase("quiz")} />
@@ -235,7 +235,7 @@ export function LearnScreen() {
               } else {
                 showToast(`📚 ${correct}/${total} — need 3/5 to pass, try again`);
               }
-              setPhase(passed ? "done" : "overview");
+              setPhase(passed ? "done" : "flashcards");
             }}
           />
         </div>
@@ -249,68 +249,22 @@ export function LearnScreen() {
             <h2>Lesson complete!</h2>
             <p className="muted">{lesson.title} — {chapter.title}</p>
             <div className="lesson-done-actions">
-              <button className="btn-primary big" onClick={() => { setPhase("overview"); setView({ kind: "chapter", chapterId: chapter.id }); }}>Continue →</button>
-              <button className="btn-ghost" style={{ width: "100%" }} onClick={() => setPhase("overview")}>Review again</button>
+              <button className="btn-primary big" onClick={() => { setPhase("flashcards"); setView({ kind: "chapter", chapterId: chapter.id }); }}>Continue →</button>
+              <button className="btn-ghost" style={{ width: "100%" }} onClick={() => setPhase("flashcards")}>Review again</button>
             </div>
           </div>
         </div>
       );
     }
 
-    // overview
+    // lesson goes straight to flashcards (Key Points / Worked Examples removed)
     return (
       <div className="page">
         <button className="back-btn" onClick={() => setView({ kind: "chapter", chapterId: chapter.id })}>← Back to {chapter.title}</button>
-        <h1 className="page-title">{lesson.title}</h1>
-        <div className="lesson-overview">
-          <div className="lesson-box">
-            <h3>💡 Key points</h3>
-            <ul className="keypoints">
-              {lesson.keyPoints.map((k, i) => <li key={i}>{k}</li>)}
-            </ul>
-          </div>
-          <div className="lesson-box">
-            <h3>✏️ Worked examples</h3>
-            {lesson.examples.map((e, i) => (
-              <div key={i} className="example">
-                <div className="example-q">{e.q}</div>
-                <ol className="example-steps">{e.s.map((st, j) => <li key={j}>{st}</li>)}</ol>
-                <div className="example-a">Answer: <strong>{e.a}</strong></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="lesson-start-card">
-          <h3>🎯 Interactive lesson</h3>
-          <p className="muted">Study {flashcards.length} Quizlet-style flashcards, then pass the 5-question Duolingo quiz (need 3/5). Works for all topics!</p>
-          <div className="lesson-start-stats">
-            <span className="lss">🃏 {flashcards.length} flashcards</span>
-            <span className="lss">✏️ 5 quiz questions</span>
-            <span className="lss">❤️ 3 hearts</span>
-          </div>
-          {done && <div className="lesson-done-badge">✅ Completed — revising gives extra practice</div>}
-          <button className="btn-primary big" onClick={() => setPhase("flashcards")}>
-            {done ? "🔁 Review flashcards" : "Start flashcards →"}
-          </button>
-          <button className="btn-ghost" style={{ width: "100%" }} onClick={() => setPhase("quiz")}>Skip to quiz →</button>
-        </div>
-
-        {done ? (
-          <div className="btn-primary btn-done" style={{ textAlign: "center", padding: "12px" }}>✅ Completed — great job!</div>
-        ) : (
-          <button
-            className="btn-ghost"
-            style={{ width: "100%" }}
-            onClick={() => {
-              completeLesson(lesson.id);
-              addXp(20);
-              showToast("Marked complete (without quiz) +20 XP");
-            }}
-          >
-            Mark as complete without quiz · +20 XP
-          </button>
-        )}
+        <h1 className="page-title">🃏 {lesson.title}</h1>
+        <p className="page-sub">Tap to flip, swipe through {flashcards.length} cards, then take the quiz.</p>
+        {done && <div className="lesson-done-badge">✅ Completed — revising gives extra practice</div>}
+        <FlashcardDeck lessonId={lesson.id} chapterId={chapter.id} onDone={() => setPhase("quiz")} />
       </div>
     );
   }
@@ -327,7 +281,7 @@ export function LearnScreen() {
           {chapter.lessons.map(l => {
             const done = s.lessonsCompleted.includes(l.id);
             return (
-              <button key={l.id} className={`lesson-card ${done ? "done" : ""}`} onClick={() => { setView({ kind: "lesson", chapterId: chapter.id, lessonId: l.id }); setPhase("overview"); }}>
+              <button key={l.id} className={`lesson-card ${done ? "done" : ""}`} onClick={() => { setView({ kind: "lesson", chapterId: chapter.id, lessonId: l.id }); setPhase("flashcards"); }}>
                 <span className="lesson-check">{done ? "✅" : "📖"}</span>
                 <span className="lesson-title">{l.title}</span>
               </button>

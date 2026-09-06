@@ -5,7 +5,7 @@ import { GameResult } from "./GameResult";
 import { getGame } from "../games";
 import { RacingGame } from "../games/RacingGame";
 import { TowerGame } from "../games/TowerGame";
-import { BalloonPopGame } from "../games/BalloonPopGame";
+import { BombDefusalGame } from "../games/BombDefusalGame";
 import { FastMathGame } from "../games/FastMathGame";
 import { MazeGame } from "../games/MazeGame";
 
@@ -19,7 +19,7 @@ import type { Difficulty, TopicId } from "../types";
 const COMPONENTS: Record<string, (props: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void }) => ComponentChildren> = {
   racing: RacingGame,
   tower: TowerGame,
-  balloon: BalloonPopGame,
+  bomb: BombDefusalGame,
   fastmath: FastMathGame,
   maze: MazeGame,
 
@@ -37,7 +37,11 @@ export function GameSession({ gameId, onExit }: { gameId: string; onExit: () => 
 
   const Game = COMPONENTS[gameId];
 
-  if (!config) {
+  // Maze and Monster PvP have their own level selection with built-in
+  // topics, so skip the shared topic/difficulty picker for them.
+  const SKIP_CONFIG = ["maze", "pvp"];
+
+  if (!config && !SKIP_CONFIG.includes(gameId)) {
     return (
       <GameConfig
         gameName={meta.name}
@@ -65,8 +69,8 @@ export function GameSession({ gameId, onExit }: { gameId: string; onExit: () => 
   return (
     <Game
       key={`${gameId}-${replayKey}`}
-      topicId={config.topicId}
-      diffId={config.diffId}
+      topicId={config?.topicId ?? "mixed"}
+      diffId={config?.diffId ?? "easy"}
       onFinish={(input) => {
         const r = finishGame(input);
         setResult({ result: r.result, newAchievements: r.newAchievements });
