@@ -15,8 +15,8 @@ export interface Product {
 }
 
 export const PRODUCTS: Product[] = [
-  { id: "remove_ads", price: "$2.99", label: "Remove Ads", emoji: "🚫", blurb: "No more ads, forever.", kind: "entitlement" },
-  { id: "unlock_games", price: "$4.99", label: "Unlock 5 Games", emoji: "🎮", blurb: "Unlocks all 5 premium games.", kind: "entitlement" },
+  { id: "remove_ads", price: "$4.99", label: "Remove Ads", emoji: "🚫", blurb: "No more ads, forever.", kind: "entitlement" },
+  { id: "unlock_games", price: "$9.99", label: "Unlock All Games", emoji: "🎮", blurb: "All games unlocked + 2× coins.", kind: "entitlement" },
   { id: "premium", price: "$9.99", label: "Premium", emoji: "💎", blurb: "All games, no ads + 2× coins.", kind: "entitlement" },
   { id: "coins_500", price: "$0.99", label: "500 Coins", emoji: "🪙", blurb: "A pocketful of coins.", kind: "consumable" },
   { id: "coins_1200", price: "$1.99", label: "1,200 Coins", emoji: "💰", blurb: "A chest of coins.", kind: "consumable" },
@@ -44,13 +44,15 @@ export function isPremiumGame(game: GameMeta): boolean {
 export function gameUnlocked(game: GameMeta): boolean {
   if (game.free) return true;
   const s = getState();
-  return s.purchases.premium === true || s.purchases.unlock_games === true;
+  return s.purchases.premium === true || s.purchases.unlock_games === true || s.unlockedByCoins[game.id] === true;
 }
 
 export function gamesUnlocked(): number {
   const s = getState();
   const premium = s.purchases.premium || s.purchases.unlock_games;
-  return premium ? 10 : 5;
+  if (premium) return 10;
+  const coinUnlocked = Object.keys(s.unlockedByCoins || {}).length;
+  return 3 + coinUnlocked;
 }
 
 export function coinsBonus(): number {

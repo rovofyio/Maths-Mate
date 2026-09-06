@@ -26,6 +26,15 @@ export function spendCoins(amount: number): boolean {
   return true;
 }
 
+export function unlockGame(id: string): boolean {
+  const s = getState();
+  if (s.coins < 100) return false;
+  if (!spendCoins(100)) return false;
+  const next = { ...s, unlockedByCoins: { ...s.unlockedByCoins, [id]: true } };
+  commit(next);
+  return true;
+}
+
 export function addXp(amount: number): number {
   const s = getState();
   const next = { ...s, xp: s.xp + amount };

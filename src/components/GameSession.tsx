@@ -37,7 +37,11 @@ export function GameSession({ gameId, onExit }: { gameId: string; onExit: () => 
 
   const Game = COMPONENTS[gameId];
 
-  if (!config) {
+  // Maze and Monster PvP have their own level selection with built-in
+  // topics, so skip the shared topic/difficulty picker for them.
+  const SKIP_CONFIG = ["maze", "pvp"];
+
+  if (!config && !SKIP_CONFIG.includes(gameId)) {
     return (
       <GameConfig
         gameName={meta.name}
@@ -65,8 +69,8 @@ export function GameSession({ gameId, onExit }: { gameId: string; onExit: () => 
   return (
     <Game
       key={`${gameId}-${replayKey}`}
-      topicId={config.topicId}
-      diffId={config.diffId}
+      topicId={config?.topicId ?? "mixed"}
+      diffId={config?.diffId ?? "easy"}
       onFinish={(input) => {
         const r = finishGame(input);
         setResult({ result: r.result, newAchievements: r.newAchievements });

@@ -28,6 +28,7 @@ export function defaultState(): PlayerState {
     lastSpinDay: null,
     spinCount: 0,
     purchases: {},
+    unlockedByCoins: {},
     adsSeen: 0,
     gamesSinceAd: 0,
     settings: { ...DEFAULT_SETTINGS },
@@ -49,6 +50,7 @@ export function loadState(): PlayerState {
       achievements: { ...(parsed.achievements ?? {}) },
       highScores: { ...(parsed.highScores ?? {}) },
       purchases: { ...(parsed.purchases ?? {}) },
+      unlockedByCoins: { ...(parsed.unlockedByCoins ?? {}) },
       lessonsCompleted: [...(parsed.lessonsCompleted ?? [])],
     };
   } catch {

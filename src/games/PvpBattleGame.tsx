@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { GameShell } from "../components/GameShell";
 import { buildReward, type ResultInput } from "./helpers";
 import { recordAnswer } from "../lib/store";
@@ -6,8 +6,11 @@ import { evaluateAfterAnswer } from "../lib/achievements";
 import type { Difficulty, TopicId } from "../types";
 import slimeUrl from "../../Pictures/Slime monster.png";
 import wizardUrl from "../../Pictures/Wizard.png";
-import wizard1Url from "../../Pictures/Wizard1.png";
 import wizard2Url from "../../Pictures/Wizard2.png";
+import stoneGolemIdleUrl from "../../Pictures/StoneGolemIdle.png";
+import stoneGolemAttackUrl from "../../Pictures/StoneGolemAttack.png";
+import shadowDemonIdleUrl from "../../Pictures/ShadowDemonIdle.png";
+import shadowDemonAttackUrl from "../../Pictures/ShadowDemonAttack.png";
 
 /* ── helpers ── */
 const ri = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -302,6 +305,15 @@ function getDamage(chosen: number, answer: number, options: number[]): { dmg: nu
   if (chosen === furthest) return { dmg: 0, tier: "miss" };
   return { dmg: 1, tier: "weak" }; // middle of 4 options
 }
+
+function getBonusDmg(elapsedSec: number): number {
+  if (elapsedSec < 5) return 5;
+  if (elapsedSec < 8) return 4;
+  if (elapsedSec < 11) return 3;
+  if (elapsedSec < 14) return 2;
+  if (elapsedSec < 17) return 1;
+  return 0;
+}
 const AGE_KEY = "pvp-age";
 
 /* ── component ── */
@@ -325,17 +337,12 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
   const [dmgPopEnemy, setDmgPopEnemy] = useState<number | null>(null);
   const [dmgPopPlayer, setDmgPopPlayer] = useState<number | null>(null);
   const [isAttacking, setIsAttacking] = useState(false);
-  const [idleFrame, setIdleFrame] = useState(0);
-
-  useEffect(() => {
-    if (isAttacking) return;
-    const id = setInterval(() => setIdleFrame(f => (f + 1) % 2), 500);
-    return () => clearInterval(id);
-  }, [isAttacking]);
+  const [isEnemyAttacking, setIsEnemyAttacking] = useState(false);
 
   const statsRef = useRef({ correct: 0, total: 0, bestStreak: 0, streak: 0 });
   const roundsRef = useRef(0);
   const overRef = useRef(false);
+  const questionStartTime = useRef<number>(Date.now());
 
   const startLevel = (lv: LevelCfg) => {
     setSelected(lv);
@@ -346,6 +353,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
     statsRef.current = { correct: 0, total: 0, bestStreak: 0, streak: 0 };
     overRef.current = false;
     setPhase("battle");
+    questionStartTime.current = Date.now();
     setQuestion(makeQsForLevel(lv.id));
     setLocked(false);
     setFlash(null);
@@ -380,6 +388,9 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
     if (!selected || !question || locked || overRef.current) return;
     setLocked(true);
     const { dmg: pDmg, tier } = getDamage(opt, question.answer, question.options);
+    const elapsedSec = Math.floor((Date.now() - questionStartTime.current) / 1000);
+    const bonusDmg = pDmg === 5 ? getBonusDmg(elapsedSec) : 0;
+    const finalPDmg = pDmg + bonusDmg;
     const isCorrect = pDmg === 5;
     const isClose = pDmg === 2;
     // record
@@ -407,10 +418,10 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
     }
 
     // animate player attack
-    setDmgPopEnemy(pDmg);
-    setEnemyShake(pDmg > 0);
-    setFlash({ tier, pDmg, eDmg: selected.enemy.dmg, boat: 0 });
-    const newEnemyHP = Math.max(0, enemyHP - pDmg);
+    setDmgPopEnemy(finalPDmg);
+    setEnemyShake(finalPDmg > 0);
+    setFlash({ tier, pDmg: finalPDmg, eDmg: selected.enemy.dmg, boat: 0 });
+    const newEnemyHP = Math.max(0, enemyHP - finalPDmg);
     setEnemyHP(newEnemyHP);
 
     // victory check before enemy counter
@@ -429,6 +440,8 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
       setEnemyShake(false);
       if (overRef.current) return;
       // enemy attacks
+      setIsEnemyAttacking(true);
+      setTimeout(() => setIsEnemyAttacking(false), 800);
       const eDmg = selected.enemy.dmg + ri(-1, 1); // variance
       const clamped = Math.max(2, eDmg);
       setDmgPopPlayer(clamped);
@@ -456,6 +469,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
           return;
         }
         setQuestion(makeQsForLevel(selected.id));
+        questionStartTime.current = Date.now();
         setLocked(false);
       }, 700);
     }, 750);
@@ -607,7 +621,13 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
             <span className="pvp-hp-num">{enemyHP}/{selected.enemy.hp}</span>
           </div>
           <div className="pvp-sprite enemy">
-            <img src={slimeUrl} className="pvp-sprite-emoji" alt={selected.enemy.name} draggable={false} />
+            {selected.enemy.name === "Stone Golem" ? (
+              <img src={isEnemyAttacking ? stoneGolemAttackUrl : stoneGolemIdleUrl} className={`pvp-sprite-emoji${isEnemyAttacking ? " pvp-sprite-attack" : ""}`} alt={selected.enemy.name} draggable={false} />
+            ) : selected.enemy.name === "Shadow Demon" ? (
+              <img src={isEnemyAttacking ? shadowDemonAttackUrl : shadowDemonIdleUrl} className={`pvp-sprite-emoji${isEnemyAttacking ? " pvp-sprite-attack" : ""}`} alt={selected.enemy.name} draggable={false} />
+            ) : (
+              <img src={slimeUrl} className="pvp-sprite-emoji" alt={selected.enemy.name} draggable={false} />
+            )}
             {dmgPopEnemy !== null && <span className={`pvp-dmg-pop ${dmgPopEnemy === 5 ? "perfect" : dmgPopEnemy===2 ? "close" : "miss"}`}>-{dmgPopEnemy}</span>}
             {flash && flash.pDmg === 5 && <span className="pvp-crit">CRITICAL!</span>}
           </div>
@@ -619,7 +639,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
             {isAttacking ? (
               <img src={wizard2Url} className="pvp-sprite-emoji pvp-sprite-attack" alt="Wizard attacking" draggable={false} />
             ) : (
-              <img src={idleFrame === 0 ? wizardUrl : wizard1Url} className="pvp-sprite-emoji" alt="Wizard" draggable={false} />
+              <img src={wizardUrl} className="pvp-sprite-emoji" alt="Wizard" draggable={false} />
             )}
             {dmgPopPlayer !== null && <span className="pvp-dmg-pop player">-{dmgPopPlayer}</span>}
           </div>
@@ -655,10 +675,9 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
                 );
               })}
             </div>
-            <div className="pvp-dmg-legend">Correct = <b>5 DMG</b> · Close = <b>2 DMG</b> · Furthest = <b>0 DMG</b></div>
-          </div>
-        )}
-      </div>
-    </GameShell>
+           </div>
+         )}
+       </div>
+     </GameShell>
   );
 }

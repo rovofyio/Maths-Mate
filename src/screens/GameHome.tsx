@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import type { CSSProperties } from "preact";
 import { GAMES } from "../games";
-import { gameUnlocked, hasNoAds } from "../lib/iap";
+import { gameUnlocked } from "../lib/iap";
 import { GameSession } from "../components/GameSession";
 import { Paywall } from "../components/Paywall";
 
@@ -17,8 +17,6 @@ export function GameHome() {
 
   return (
     <div className="page">
-      {!hasNoAds() && <div className="banner-slot" />}
-
       <div className="game-grid">
         {GAMES.map((g) => {
           const unlocked = gameUnlocked(g);
@@ -50,13 +48,6 @@ export function GameHome() {
             </button>
           );
         })}
-      </div>
-
-      <div className="games-tip">
-        <span>💡</span>
-        <div>
-          <strong>Tip:</strong> consecutive correct answers build streaks that power up your Tower bolts and grow your coins faster.
-        </div>
       </div>
 
       {paywallOpen && <Paywall onClose={() => setPaywallOpen(false)} />}

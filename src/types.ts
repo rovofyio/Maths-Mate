@@ -57,6 +57,7 @@ export interface PlayerState {
   lastSpinDay: string | null;
   spinCount: number;
   purchases: Record<string, boolean>;
+  unlockedByCoins: Record<string, boolean>;
   adsSeen: number;
   gamesSinceAd: number;
   settings: PlayerSettings;

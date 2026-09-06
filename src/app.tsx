@@ -1,4 +1,5 @@
 import { signal } from "@preact/signals";
+import { useState } from "preact/hooks";
 import { state } from "./lib/store";
 import { levelForXp } from "./lib/storage";
 import { GameHome } from "./screens/GameHome";
@@ -6,6 +7,7 @@ import { LearnScreen } from "./screens/LearnScreen";
 import { DailyScreen } from "./screens/DailyScreen";
 import { ProfileScreen } from "./screens/ProfileScreen";
 import { toastSignal } from "./lib/toast";
+import { SupportModal } from "./components/SupportModal";
 import type { Route } from "./types";
 
 const activeRoute = signal<Route>({ name: "games" });
@@ -23,6 +25,7 @@ function Toast() {
 export function App() {
   const route = activeRoute.value;
   const s = state.value;
+  const [showSupport, setShowSupport] = useState(false);
 
   const nav = [
     { name: "games" as const, label: "Games", icon: "🎮" },
@@ -39,10 +42,11 @@ export function App() {
             <span className="brand-icon">🧮</span>
             <span className="brand-name">Math Aura</span>
           </div>
-          <div className="topbar-stats">
-            <div className="stat-chip" title="Coins">
-              🪙 {s.coins}
-            </div>
+<div className="topbar-stats">
+               <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
+               <div className="stat-chip" title="Coins">
+                 🪙 {s.coins}
+               </div>
             <div className="stat-chip" title="Experience">
               ⭐ {s.xp}
             </div>
@@ -51,9 +55,8 @@ export function App() {
             </div>
           </div>
         </div>
-      </header>
-
-      <main className="view">
+</header>
+       <main className="view">
         {route.name === "games" && <GameHome />}
         {route.name === "learn" && <LearnScreen />}
         {route.name === "daily" && <DailyScreen />}
@@ -72,6 +75,7 @@ export function App() {
       </footer>
 
       <Toast />
+      {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
     </div>
   );
 }
