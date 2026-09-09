@@ -1,19 +1,19 @@
 import { useState } from "preact/hooks";
 import type { CSSProperties } from "preact";
-import { GAMES } from "../games";
+import { GAMES, getGame } from "../games";
 import { gameUnlocked } from "../lib/iap";
 import { GameSession } from "../components/GameSession";
-import { Paywall } from "../components/Paywall";
-
-import { showToast } from "../lib/toast";
+import { UnlockGameModal } from "../components/UnlockGameModal";
 
 export function GameHome() {
   const [activeGame, setActiveGame] = useState<string | null>(null);
-  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [unlockGameId, setUnlockGameId] = useState<string | null>(null);
 
   if (activeGame) {
     return <GameSession gameId={activeGame} onExit={() => setActiveGame(null)} />;
   }
+
+  const pendingGame = unlockGameId ? getGame(unlockGameId) : null;
 
   return (
     <div className="page">
@@ -27,10 +27,7 @@ export function GameHome() {
               style={{ "--acc": g.color } as CSSProperties}
               onClick={() => {
                 if (unlocked) setActiveGame(g.id);
-                else {
-                  setPaywallOpen(true);
-                  showToast("🔒 Unlock this game with Premium!");
-                }
+                else setUnlockGameId(g.id);
               }}
             >
               <div className="game-art">
@@ -39,18 +36,23 @@ export function GameHome() {
               <div className="game-body">
                 <h3>{g.name}</h3>
                 <p>{g.blurb}</p>
-                <div className="game-tags">
-                  <span className="game-tag" style={{ color: g.color, background: `${g.color}1a` }}>
-                    {g.free ? "Free" : "Premium"} · {g.ages[0]}-{g.ages[1]} yrs
-                  </span>
-                </div>
               </div>
             </button>
           );
         })}
       </div>
 
-      {paywallOpen && <Paywall onClose={() => setPaywallOpen(false)} />}
+      {pendingGame && (
+        <UnlockGameModal
+          game={pendingGame}
+          onClose={() => setUnlockGameId(null)}
+          onUnlocked={() => {
+            const id = unlockGameId;
+            setUnlockGameId(null);
+            if (id) setActiveGame(id);
+          }}
+        />
+      )}
     </div>
   );
 }

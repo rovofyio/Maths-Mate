@@ -1,4 +1,5 @@
 import { getState, updateSettings } from "./store";
+import { refreshPowerSaver, type PowerMode } from "./perf";
 
 export function applyTheme(theme: "light" | "dark"): void {
   document.documentElement.dataset.theme = theme;
@@ -13,4 +14,19 @@ export function setTheme(theme: "light" | "dark"): void {
 
 export function initTheme(): void {
   applyTheme(getState().settings.theme);
+}
+
+export function setPowerMode(mode: PowerMode): void {
+  updateSettings({ powerMode: mode });
+  refreshPowerSaver(() => getState().settings.powerMode);
+}
+
+export function initPowerMode(): void {
+  refreshPowerSaver(() => {
+    try {
+      return getState().settings.powerMode;
+    } catch {
+      return "auto";
+    }
+  });
 }

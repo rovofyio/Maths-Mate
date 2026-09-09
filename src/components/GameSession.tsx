@@ -1,22 +1,25 @@
 import { useState } from "preact/hooks";
+import { lazy, Suspense } from "preact/compat";
 import { GameConfig } from "./Quiz";
 import { finishGame, type ResultInput } from "../games/helpers";
 import { GameResult } from "./GameResult";
 import { getGame } from "../games";
-import { RacingGame } from "../games/RacingGame";
-import { TowerGame } from "../games/TowerGame";
-import { BombDefusalGame } from "../games/BombDefusalGame";
-import { FastMathGame } from "../games/FastMathGame";
-import { MazeGame } from "../games/MazeGame";
-
-import { PvpBattleGame } from "../games/PvpBattleGame";
-import { FractionsGame } from "../games/FractionsGame";
-import { RunnerGame } from "../games/RunnerGame";
-import { TrueFalseGame } from "../games/TrueFalseGame";
 import type { ComponentChildren } from "preact";
 import type { Difficulty, TopicId } from "../types";
 
-const COMPONENTS: Record<string, (props: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void }) => ComponentChildren> = {
+// Each game is code-split so low-RAM devices only download/parse the game
+// actually being played instead of all 9 games up front.
+const RacingGame = lazy(() => import("../games/RacingGame").then((m) => ({ default: m.RacingGame })));
+const TowerGame = lazy(() => import("../games/TowerGame").then((m) => ({ default: m.TowerGame })));
+const BombDefusalGame = lazy(() => import("../games/BombDefusalGame").then((m) => ({ default: m.BombDefusalGame })));
+const FastMathGame = lazy(() => import("../games/FastMathGame").then((m) => ({ default: m.FastMathGame })));
+const MazeGame = lazy(() => import("../games/MazeGame").then((m) => ({ default: m.MazeGame })));
+const PvpBattleGame = lazy(() => import("../games/PvpBattleGame").then((m) => ({ default: m.PvpBattleGame })));
+const FractionsGame = lazy(() => import("../games/FractionsGame").then((m) => ({ default: m.FractionsGame })));
+const RunnerGame = lazy(() => import("../games/RunnerGame").then((m) => ({ default: m.RunnerGame })));
+const TrueFalseGame = lazy(() => import("../games/TrueFalseGame").then((m) => ({ default: m.TrueFalseGame })));
+
+const COMPONENTS: Record<string, (props: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void; onExit?: () => void }) => ComponentChildren> = {
   racing: RacingGame,
   tower: TowerGame,
   bomb: BombDefusalGame,
@@ -67,14 +70,17 @@ export function GameSession({ gameId, onExit }: { gameId: string; onExit: () => 
   }
 
   return (
-    <Game
-      key={`${gameId}-${replayKey}`}
-      topicId={config?.topicId ?? "mixed"}
-      diffId={config?.diffId ?? "easy"}
-      onFinish={(input) => {
-        const r = finishGame(input);
-        setResult({ result: r.result, newAchievements: r.newAchievements });
-      }}
-    />
+    <Suspense fallback={<div className="page"><p className="muted">Loading game…</p></div>}>
+      <Game
+        key={`${gameId}-${replayKey}`}
+        topicId={config?.topicId ?? "mixed"}
+        diffId={config?.diffId ?? "easy"}
+        onExit={onExit}
+        onFinish={(input) => {
+          const r = finishGame(input);
+          setResult({ result: r.result, newAchievements: r.newAchievements });
+        }}
+      />
+    </Suspense>
   );
 }

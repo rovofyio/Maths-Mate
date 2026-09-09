@@ -3,6 +3,7 @@ import { GameShell } from "../components/GameShell";
 import { QuestionCard } from "../components/Quiz";
 import { buildReward, type ResultInput } from "./helpers";
 import { getTopic, DIFFICULTIES, makeQuestion } from "../lib/questions";
+import { isPowerSaverActive } from "../lib/perf";
 import type { Difficulty, Question, TopicId } from "../types";
 
 const GAME_SECONDS = 60;
@@ -76,7 +77,8 @@ export function RunnerGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
       setAnim("trip");
     }
     const obstacle = { id: obstacleIdRef.current++, hit: !correct };
-    setObstacles((prev) => [...prev, obstacle]);
+    // Low-power: cap live obstacle nodes so the DOM stays small on weak GPUs.
+    setObstacles((prev) => (isPowerSaverActive() ? [...prev.slice(-1), obstacle] : [...prev, obstacle]));
     setTimeout(() => {
       setObstacles((prev) => prev.filter((item) => item.id !== obstacle.id));
     }, OBSTACLE_DURATION);

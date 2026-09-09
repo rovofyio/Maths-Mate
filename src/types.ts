@@ -41,6 +41,11 @@ export interface PlayerSettings {
   music: boolean;
   googlePlay: boolean;
   facebook: boolean;
+  /** Display name of the connected Google / Facebook account (if any). */
+  googleName?: string;
+  facebookName?: string;
+  /** Performance mode: auto-detect low-end hardware, force full, or force saver. */
+  powerMode: "auto" | "full" | "saver";
 }
 
 export interface PlayerState {
@@ -68,7 +73,9 @@ export type Route =
   | { name: "games" }
   | { name: "learn" }
   | { name: "daily" }
-  | { name: "profile" };
+  | { name: "profile" }
+  | { name: "shop" }
+  | { name: "settings" };
 
 export interface GameMeta {
   id: string;

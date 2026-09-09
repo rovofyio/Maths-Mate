@@ -317,7 +317,7 @@ function getBonusDmg(elapsedSec: number): number {
 const AGE_KEY = "pvp-age";
 
 /* ── component ── */
-export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void }) {
+export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void; onExit?: () => void }) {
   const [age, setAge] = useState<number | null>(() => {
     try { const v = localStorage.getItem(AGE_KEY); return v ? parseInt(v, 10) : null; } catch { return null; }
   });
@@ -366,11 +366,36 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
     setAge(n);
   };
 
+  const handleExit = () => {
+    if (onExit) onExit();
+    else finish(false);
+  };
+
   const finish = (won: boolean) => {
     if (overRef.current) return;
     overRef.current = true;
     const s = statsRef.current;
-    const lv = selected!;
+    // No level started yet (age gate / level select): exit directly
+    // instead of building a result from a null level.
+    if (!selected) {
+      if (onExit) {
+        onExit();
+        return;
+      }
+      const reward = buildReward({ won: false, correct: 0, diffId: "easy", bonus: 0 });
+      onFinish({
+        gameId: "pvp",
+        won: false,
+        correct: 0,
+        total: 0,
+        bestStreak: 0,
+        score: 0,
+        coins: reward.coins,
+        xp: reward.xp,
+      });
+      return;
+    }
+    const lv = selected;
     const reward = buildReward({ won, correct: s.correct, diffId: lv.diff, bonus: won ? 15 : 0 });
     onFinish({
       gameId: "pvp",
@@ -478,7 +503,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
   /* ── age gate ── */
   if (age !== null && (age < 12 || age > 18)) {
     return (
-      <GameShell emoji="⚔️" name="Monster PvP" onQuit={() => finish(false)}>
+      <GameShell emoji="⚔️" name="Monster PvP" onQuit={handleExit}>
         <div className="pvp-agegate">
           <div className="pvp-age-emoji">🔒</div>
           <h2>Age Restricted</h2>
@@ -496,7 +521,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
             />
             <button className="btn-primary" onClick={handleAgeSubmit}>Update age</button>
           </div>
-          <button className="btn-ghost" style={{ width: "100%" }} onClick={() => finish(false)}>← Back to games</button>
+          <button className="btn-ghost" style={{ width: "100%" }} onClick={handleExit}>← Back to games</button>
         </div>
       </GameShell>
     );
@@ -504,7 +529,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
 
   if (age === null) {
     return (
-      <GameShell emoji="⚔️" name="Monster PvP" onQuit={() => finish(false)}>
+      <GameShell emoji="⚔️" name="Monster PvP" onQuit={handleExit}>
         <div className="pvp-agegate">
           <div className="pvp-age-emoji">⚔️</div>
           <h2>Enter the Arena</h2>
@@ -522,6 +547,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
             <button className="btn-primary" onClick={handleAgeSubmit}>Enter Battle</button>
           </div>
           <p className="muted small">Your age is stored locally to enforce the arena restriction.</p>
+          <button className="btn-ghost" style={{ width: "100%" }} onClick={handleExit}>← Back to games</button>
         </div>
       </GameShell>
     );
@@ -530,7 +556,7 @@ export function PvpBattleGame({ onFinish }: { topicId: TopicId; diffId: Difficul
   /* ── level select ── */
   if (phase === "select" || !selected) {
     return (
-      <GameShell emoji="⚔️" name="Monster PvP" pills={[`Age ${age}`, "12-18 only"]} onQuit={() => finish(false)}>
+      <GameShell emoji="⚔️" name="Monster PvP" pills={[`Age ${age}`, "12-18 only"]} onQuit={handleExit}>
         <div className="pvp-select">
           <p className="pvp-select-sub">Pokémon-style PvP: you vs monster. Answer maths to attack. <b>5 DMG = correct</b> · <b>2 DMG = close</b> · <b>0 DMG = furthest</b>. Beat the monster before it beats you!</p>
           <div className="pvp-level-grid">

@@ -1,5 +1,6 @@
 /* Math Aura — Duolingo-inspired flat theme (purple) */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
+/* Nunito is loaded via <link> in index.html (non-blocking); system fonts
+   render instantly on slow devices until it arrives (display=swap). */
 
 :root {
   --primary: #7b1fa2;
@@ -1865,6 +1866,8 @@ footer {
 .flashcard-face.back .fc-tap { color: #a99bc6; }
 .fc-actions { display: flex; gap: 8px; }
 .fc-actions .btn-ghost { flex: 1; }
+.fc-actions .btn-primary { flex: 1; }
+.fc-go-quiz { width: 100%; }
 .fc-know { flex: 1; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 12px; padding: 10px; font-weight: 900; cursor: pointer; }
 .fc-know.known { background: #f3e5f5; border-color: #ab47bc; color: #4a0072; }
 .fc-dots { display: flex; gap: 6px; justify-content: center; }
@@ -1881,12 +1884,9 @@ footer {
 .duo-progress-fill { height: 100%; background: #58cc02; border-radius: 999px; transition: width 0.35s; }
 .duo-hearts { display: flex; gap: 2px; font-size: 1.1rem; }
 .heart.alive { filter: none; } .heart.dead { opacity: 0.35; }
-.duo-question { display: flex; gap: 10px; align-items: flex-start; }
-.duo-character { font-size: 2.2rem; width: 56px; height: 56px; display: grid; place-items: center; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 16px; flex-shrink: 0; }
-.duo-bubble {
-  flex: 1; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 18px; padding: 14px; position: relative;
+.duo-question-top {
+  background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 18px; padding: 14px;
 }
-.duo-bubble::before { content: ""; position: absolute; left: -8px; top: 18px; width: 14px; height: 14px; background: #fff; border-left: 2px solid var(--border); border-bottom: 2px solid var(--border); transform: rotate(45deg); }
 .duo-prompt { font-size: 1.1rem; font-weight: 900; line-height: 1.4; color: #000; }
 .duo-explain { margin-top: 8px; font-size: 0.85rem; color: #3b2a5e; font-weight: 600; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; padding: 8px; }
 .duo-options { display: grid; gap: 8px; }
@@ -1912,10 +1912,8 @@ footer {
 /* Dark mode for learn */
 [data-theme="dark"] .lesson-start-card,
 [data-theme="dark"] .lesson-done-card,
-[data-theme="dark"] .duo-bubble,
-[data-theme="dark"] .duo-result,
-[data-theme="dark"] .duo-character { background: #221e32; border-color: #2f2850; color: #fff; }
-[data-theme="dark"] .duo-bubble::before { background: #221e32; border-color: #2f2850; }
+[data-theme="dark"] .duo-question-top,
+[data-theme="dark"] .duo-result { background: #221e32; border-color: #2f2850; color: #fff; }
 [data-theme="dark"] .duo-prompt { color: #fff; }
 [data-theme="dark"] .duo-explain { background: #2a2342; border-color: #3b2e6b; color: #ffffff; }
 [data-theme="dark"] .duo-opt { background: #221e32; border-color: #2f2850; color: #fff; }
@@ -1981,3 +1979,88 @@ footer {
 [data-theme="dark"] .chapter-card .chapter-body h3,
 [data-theme="dark"] .game-card .game-body p,
 [data-theme="dark"] .chapter-card .chapter-body p { color: #ffffff !important; }
+
+/* ── Power saver (low-power / low-hardware devices) ─────────────────────
+   Enabled via <html data-power="saver"> — manually in Settings → Performance,
+   or automatically on weak hardware / data-saver / reduced-motion.
+   Kills the most GPU-expensive work: infinite keyframe animations,
+   backdrop blur, hue-rotate image filters, long transitions. */
+[data-power="saver"] html, [data-power="saver"] body,
+html[data-power="saver"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+[data-power="saver"] .runner-sky { background: var(--bg); }
+[data-power="saver"] .ground-dashes,
+[data-power="saver"] .runner.running,
+[data-power="saver"] .runner.jump,
+[data-power="saver"] .runner.trip,
+[data-power="saver"] .obstacle,
+[data-power="saver"] .bomb,
+[data-power="saver"] .bomb-shake,
+[data-power="saver"] .bomb-top::before,
+[data-power="saver"] .bomb-spark,
+[data-power="saver"] .bomb-timer.timer-danger,
+[data-power="saver"] .explosion-ring,
+[data-power="saver"] .explosion-fire,
+[data-power="saver"] .explosion-text,
+[data-power="saver"] .pvp-sprite-emoji,
+[data-power="saver"] .pvp-combatant.shake,
+[data-power="saver"] .pvp-sprite-attack,
+[data-power="saver"] .pvp-dmg-pop,
+[data-power="saver"] .pvp-crit,
+[data-power="saver"] .bomb-feedback,
+[data-power="saver"] .jump-word,
+[data-power="saver"] .trip-word,
+[data-power="saver"] .maze-cell.player.flash-correct,
+[data-power="saver"] .maze-cell.player.flash-wrong,
+[data-power="saver"] .maze-flash-msg,
+[data-power="saver"] .pause-card {
+  animation: none !important;
+}
+[data-power="saver"] .obstacle { right: 30%; }
+[data-power="saver"] .runner.running { transform: none; }
+[data-power="saver"] .wheel { transition-duration: 0.4s !important; }
+[data-power="saver"] .race-car { transition: none !important; }
+[data-power="saver"] .progress-fill,
+[data-power="saver"] .timer-fill,
+[data-power="saver"] .player-bar,
+[data-power="saver"] .mini-bar .cpu,
+[data-power="saver"] .maze-cell,
+[data-power="saver"] .flashcard-inner,
+[data-power="saver"] .pvp-hp-fill,
+[data-power="saver"] .fc-progress-fill,
+[data-power="saver"] .duo-progress-fill {
+  transition: none !important;
+}
+/* hue-rotate/saturate filters on car PNGs are GPU-heavy — plain images in saver */
+[data-power="saver"] .car-rival,
+[data-power="saver"] .car-player { filter: none !important; }
+[data-power="saver"] .car-png { filter: none !important; }
+/* backdrop-filter blur on overlays forces expensive compositing on weak GPUs */
+[data-power="saver"] .pause-overlay,
+[data-power="saver"] .modal-overlay,
+[data-power="saver"] .result-overlay { backdrop-filter: none !important; }
+[data-power="saver"] .pause-overlay,
+[data-power="saver"] .modal-overlay,
+[data-power="saver"] .result-overlay,
+[data-power="saver"] .explosion-overlay { background: rgba(59, 46, 88, 0.6); }
+[data-power="saver"] .runner-stage,
+[data-power="saver"] .obstacle,
+[data-power="saver"] .bomb-body,
+[data-power="saver"] .tower-field { box-shadow: none !important; }
+
+/* Respect the OS-level reduced-motion setting even in full-effects mode. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ground-dashes,
+  .runner.running,
+  .bomb,
+  .bomb-shake,
+  .pvp-sprite-emoji { animation: none !important; }
+  .pause-overlay, .modal-overlay, .result-overlay { backdrop-filter: none !important; }
+}

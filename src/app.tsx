@@ -1,14 +1,20 @@
 import { signal } from "@preact/signals";
 import { useState } from "preact/hooks";
+import { lazy, Suspense } from "preact/compat";
 import { state } from "./lib/store";
 import { levelForXp } from "./lib/storage";
-import { GameHome } from "./screens/GameHome";
-import { LearnScreen } from "./screens/LearnScreen";
-import { DailyScreen } from "./screens/DailyScreen";
-import { ProfileScreen } from "./screens/ProfileScreen";
 import { toastSignal } from "./lib/toast";
 import { SupportModal } from "./components/SupportModal";
 import type { Route } from "./types";
+
+// Code-split by tab so low-memory devices only parse/hold the JS for the
+// screen in use (games list stays light; heavy screens load on demand).
+const GameHome = lazy(() => import("./screens/GameHome").then((m) => ({ default: m.GameHome })));
+const LearnScreen = lazy(() => import("./screens/LearnScreen").then((m) => ({ default: m.LearnScreen })));
+const DailyScreen = lazy(() => import("./screens/DailyScreen").then((m) => ({ default: m.DailyScreen })));
+const ProfileScreen = lazy(() => import("./screens/ProfileScreen").then((m) => ({ default: m.ProfileScreen })));
+const ShopScreen = lazy(() => import("./screens/ShopScreen").then((m) => ({ default: m.ShopScreen })));
+const SettingsScreen = lazy(() => import("./screens/SettingsScreen").then((m) => ({ default: m.SettingsScreen })));
 
 const activeRoute = signal<Route>({ name: "games" });
 
@@ -32,6 +38,8 @@ export function App() {
     { name: "learn" as const, label: "Learn", icon: "📚" },
     { name: "daily" as const, label: "Daily", icon: "🎡" },
     { name: "profile" as const, label: "Profile", icon: "👤" },
+    { name: "shop" as const, label: "Shop", icon: "💎" },
+    { name: "settings" as const, label: "Settings", icon: "⚙️" },
   ];
 
   return (
@@ -57,11 +65,15 @@ export function App() {
         </div>
 </header>
        <main className="view">
-        {route.name === "games" && <GameHome />}
-        {route.name === "learn" && <LearnScreen />}
-        {route.name === "daily" && <DailyScreen />}
-        {route.name === "profile" && <ProfileScreen />}
-      </main>
+        <Suspense fallback={<div className="page"><p className="muted">Loading…</p></div>}>
+         {route.name === "games" && <GameHome />}
+         {route.name === "learn" && <LearnScreen />}
+         {route.name === "daily" && <DailyScreen />}
+         {route.name === "profile" && <ProfileScreen />}
+         {route.name === "shop" && <ShopScreen />}
+         {route.name === "settings" && <SettingsScreen />}
+        </Suspense>
+       </main>
 
       <footer>
         <nav className="bottom-nav" aria-label="Main navigation">

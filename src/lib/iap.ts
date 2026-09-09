@@ -3,7 +3,7 @@ import { getState, setPurchase, hasPurchase } from "./store";
 export { hasPurchase };
 import type { GameMeta } from "../types";
 
-export type ProductId = "remove_ads" | "premium" | "unlock_games" | "coins_500" | "coins_1200" | "coins_2500";
+export type ProductId = "remove_ads" | "premium" | "unlock_games" | "coins_500" | "coins_1200" | "coins_2500" | "stars_500";
 
 export interface Product {
   id: ProductId;
@@ -16,17 +16,22 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [
   { id: "remove_ads", price: "$4.99", label: "Remove Ads", emoji: "🚫", blurb: "No more ads, forever.", kind: "entitlement" },
-  { id: "unlock_games", price: "$9.99", label: "Unlock All Games", emoji: "🎮", blurb: "All games unlocked + 2× coins.", kind: "entitlement" },
-  { id: "premium", price: "$9.99", label: "Premium", emoji: "💎", blurb: "All games, no ads + 2× coins.", kind: "entitlement" },
+  { id: "unlock_games", price: "$1.99", label: "Unlock All Games", emoji: "🎮", blurb: "All games unlocked + 2× coins.", kind: "entitlement" },
+  { id: "premium", price: "$1.99", label: "Premium", emoji: "💎", blurb: "All games, no ads + 2× coins.", kind: "entitlement" },
   { id: "coins_500", price: "$0.99", label: "500 Coins", emoji: "🪙", blurb: "A pocketful of coins.", kind: "consumable" },
   { id: "coins_1200", price: "$1.99", label: "1,200 Coins", emoji: "💰", blurb: "A chest of coins.", kind: "consumable" },
   { id: "coins_2500", price: "$3.99", label: "2,500 Coins", emoji: "🏦", blurb: "A vault of coins.", kind: "consumable" },
+  { id: "stars_500", price: "$2.99", label: "500 Stars", emoji: "⭐", blurb: "A burst of stars to unlock games.", kind: "consumable" },
 ];
 
 export const COIN_PACKS: Partial<Record<ProductId, number>> = {
   coins_500: 500,
   coins_1200: 1200,
   coins_2500: 2500,
+};
+
+export const STAR_PACKS: Partial<Record<ProductId, number>> = {
+  stars_500: 500,
 };
 
 export function hasPremium(): boolean {

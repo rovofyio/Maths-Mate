@@ -8,9 +8,10 @@ export const DEFAULT_SETTINGS = {
   ttsSpeed: 1,
   carColor: "#e74c3c",
   theme: "light" as const,
-  music: false,
+  music: true,
   googlePlay: false,
   facebook: false,
+  powerMode: "auto" as const,
 };
 
 export function defaultState(): PlayerState {

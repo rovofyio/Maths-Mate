@@ -1,22 +1,18 @@
 import { useState } from "preact/hooks";
-import { state, resetAll, updateSettings } from "../lib/store";
+import { state } from "../lib/store";
 import { levelProgress } from "../lib/storage";
 import { totalLessons } from "../data/chapters";
 import { accuracy as calcAccuracy } from "../games/helpers";
 import { ACHIEVEMENTS } from "../lib/achievements";
 import { allScores, GAME_NAMES, totalScore } from "../lib/leaderboard";
-import { showToast } from "../lib/toast";
-import { setTheme } from "../lib/settings";
-import { startMusic, stopMusic } from "../lib/music";
 import { Paywall } from "../components/Paywall";
 
-type Tab = "stats" | "achievements" | "leaderboard" | "shop" | "settings";
+type Tab = "stats" | "achievements" | "leaderboard";
 
 export function ProfileScreen() {
   const [tab, setTab] = useState<Tab>("stats");
   const [paywall, setPaywall] = useState(false);
   const s = state.value;
-  const cfg = s.settings;
   const prog = levelProgress(s.xp);
   const acc = calcAccuracy(s.correctAnswers, s.totalAnswers);
   const stats = s.topicStats;
@@ -26,8 +22,6 @@ export function ProfileScreen() {
     { id: "stats", label: "📊 Stats" },
     { id: "achievements", label: "🏆 Badges" },
     { id: "leaderboard", label: "🏅 Board" },
-    { id: "shop", label: "💎 Shop" },
-    { id: "settings", label: "⚙️ Settings" },
   ];
 
   return (
@@ -160,114 +154,6 @@ export function ProfileScreen() {
           )}
         </div>
       )}
-
-      {tab === "shop" && (
-        <div className="shop-intro">
-          <p className="muted">The shop lets you buy coin packs and remove ads with real money — all games are always free.</p>
-          <button className="btn-primary big" onClick={() => setPaywall(true)}>
-            💎 Open the shop
-          </button>
-        </div>
-      )}
-
-      {tab === "settings" && (
-        <div className="settings-list">
-          <h2 className="section-title no-margin">🔗 Accounts</h2>
-          <div className="setting-row">
-            <div className="setting-info">
-              <span className="setting-icon">▶️</span>
-              <div>
-                <div className="setting-name">Google Play Games</div>
-                <div className="setting-desc">{cfg.googlePlay ? "Connected" : "Sync achievements and leaderboards"}</div>
-              </div>
-            </div>
-            <button
-              className={cfg.googlePlay ? "btn-ghost connected-btn" : "btn-buy"}
-              onClick={() => {
-                updateSettings({ googlePlay: !cfg.googlePlay });
-                showToast(cfg.googlePlay ? "Disconnected from Google Play" : "✅ Connected to Google Play!");
-              }}
-            >
-              {cfg.googlePlay ? "✓ Connected" : "Connect"}
-            </button>
-          </div>
-          <div className="setting-row">
-            <div className="setting-info">
-              <span className="setting-icon">📘</span>
-              <div>
-                <div className="setting-name">Facebook</div>
-                <div className="setting-desc">{cfg.facebook ? "Connected" : "Share scores with friends"}</div>
-              </div>
-            </div>
-            <button
-              className={cfg.facebook ? "btn-ghost connected-btn" : "btn-buy"}
-              onClick={() => {
-                updateSettings({ facebook: !cfg.facebook });
-                showToast(cfg.facebook ? "Disconnected from Facebook" : "✅ Connected to Facebook!");
-              }}
-            >
-              {cfg.facebook ? "✓ Connected" : "Connect"}
-            </button>
-          </div>
-
-          <h2 className="section-title no-margin">🎨 Appearance</h2>
-          <div className="setting-row">
-            <div className="setting-info">
-              <span className="setting-icon">{cfg.theme === "dark" ? "🌙" : "☀️"}</span>
-              <div>
-                <div className="setting-name">Theme</div>
-                <div className="setting-desc">{cfg.theme === "dark" ? "Dark mode" : "Light mode"}</div>
-              </div>
-            </div>
-            <div className="segmented">
-              <button className={`segment ${cfg.theme === "light" ? "active" : ""}`} onClick={() => setTheme("light")}>
-                ☀️ Light
-              </button>
-              <button className={`segment ${cfg.theme === "dark" ? "active" : ""}`} onClick={() => setTheme("dark")}>
-                🌙 Dark
-              </button>
-            </div>
-          </div>
-
-          <h2 className="section-title no-margin">🔊 Audio</h2>
-          <div className="setting-row">
-            <div className="setting-info">
-              <span className="setting-icon">{cfg.music ? "🎵" : "🔇"}</span>
-              <div>
-                <div className="setting-name">Music</div>
-                <div className="setting-desc">{cfg.music ? "On" : "Off"}</div>
-              </div>
-            </div>
-            <button
-              className={`toggle ${cfg.music ? "on" : ""}`}
-              role="switch"
-              aria-checked={cfg.music}
-              aria-label="Toggle music"
-              onClick={() => {
-                const next = !cfg.music;
-                updateSettings({ music: next });
-                if (next) startMusic();
-                else stopMusic();
-              }}
-            >
-              <span className="toggle-knob" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      <button
-        className="btn-danger"
-        onClick={() => {
-          if (confirm("Reset all progress? This cannot be undone.")) {
-            resetAll();
-            showToast("Progress reset");
-          }
-        }}
-      >
-        Reset all progress
-      </button>
-      <p className="muted small">Progress is stored locally on this device.</p>
 
       {paywall && <Paywall onClose={() => setPaywall(false)} />}
     </div>

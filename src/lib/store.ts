@@ -26,10 +26,27 @@ export function spendCoins(amount: number): boolean {
   return true;
 }
 
-export function unlockGame(id: string): boolean {
+export const GAME_COIN_PRICE = 100;
+export const GAME_STAR_PRICE = 100;
+
+export function spendXp(amount: number): boolean {
   const s = getState();
-  if (s.coins < 100) return false;
-  if (!spendCoins(100)) return false;
+  if (s.xp < amount) return false;
+  commit({ ...s, xp: s.xp - amount });
+  return true;
+}
+
+export function unlockGame(id: string): boolean {
+  if (!spendCoins(GAME_COIN_PRICE)) return false;
+  const s = getState();
+  const next = { ...s, unlockedByCoins: { ...s.unlockedByCoins, [id]: true } };
+  commit(next);
+  return true;
+}
+
+export function unlockGameWithXp(id: string): boolean {
+  if (!spendXp(GAME_STAR_PRICE)) return false;
+  const s = getState();
   const next = { ...s, unlockedByCoins: { ...s.unlockedByCoins, [id]: true } };
   commit(next);
   return true;

@@ -269,7 +269,7 @@ export function getFlashcardsForLesson(lesson: Lesson): Flashcard[] {
       id: `kp-${i}`,
       front: lesson.title,
       back: kp,
-      frontHint: `Key Point ${i+1} — tap to reveal`,
+      frontHint: `Key Point ${i+1}`,
       backHint: "Tap to flip back"
     });
   });
@@ -278,7 +278,7 @@ export function getFlashcardsForLesson(lesson: Lesson): Flashcard[] {
       id: `ex-${i}`,
       front: ex.q,
       back: `Answer: ${ex.a}`,
-      frontHint: "Worked Example — tap to reveal",
+      frontHint: "Worked Example",
       backHint: ex.s.join(" • ")
     });
   });

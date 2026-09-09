@@ -5,6 +5,7 @@ import { buildReward, type ResultInput } from "./helpers";
 import type { Difficulty, TopicId } from "../types";
 import { getTopic, DIFFICULTIES, makeQuestion } from "../lib/questions";
 import { GreenSuperCar, RedSuperCar } from "../components/CarIcons";
+import { isPowerSaverActive } from "../lib/perf";
 
 export function RacingGame({ topicId, diffId, onFinish }: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void }) {
   const TRACK = 100;
@@ -34,14 +35,16 @@ export function RacingGame({ topicId, diffId, onFinish }: { topicId: TopicId; di
   };
 
   useEffect(() => {
+    // Low-power: tick the rival 3x less often — fewer re-renders, less battery.
+    const saver = isPowerSaverActive();
     const idle = setInterval(() => {
       if (overRef.current) return;
       setCpuPos((p) => {
-        const np = Math.min(TRACK, p + 0.25 + Math.random() * 0.4);
+        const np = Math.min(TRACK, p + (saver ? 0.75 + Math.random() * 1.2 : 0.25 + Math.random() * 0.4));
         if (np >= TRACK) finish(false);
         return np;
       });
-    }, 300);
+    }, saver ? 900 : 300);
     return () => clearInterval(idle);
   }, []);
 

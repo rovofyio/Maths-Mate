@@ -23,7 +23,6 @@ function FlashcardDeck({ lessonId, chapterId, onDone }: { lessonId: string; chap
   const total = cards.length;
   const cur = cards[idx];
   const progress = ((idx + 1) / total) * 100;
-  const allSeen = known.size === total;
 
   const next = () => {
     if (idx < total - 1) { setIdx(i => i + 1); setFlipped(false); }
@@ -57,32 +56,31 @@ function FlashcardDeck({ lessonId, chapterId, onDone }: { lessonId: string; chap
       </div>
 
       <div className="fc-actions">
-        <button className="btn-ghost" onClick={prev} disabled={idx === 0}>← Prev</button>
-        <button
-          className={`fc-know ${known.has(idx) ? "known" : ""}`}
-          onClick={() => {
-            const n = new Set(known);
-            if (n.has(idx)) n.delete(idx); else n.add(idx);
-            setKnown(n);
-          }}
-        >
-          {known.has(idx) ? "★ Known" : "☆ Mark known"}
-        </button>
-        <button className="btn-ghost" onClick={next} disabled={idx === total - 1}>Next →</button>
+        {idx === total - 1 ? (
+          <button className="btn-primary big fc-go-quiz" onClick={onDone}>Go to Quiz →</button>
+        ) : (
+          <>
+            <button className="btn-primary" style={{ flex: 1 }} onClick={prev} disabled={idx === 0}>← Prev</button>
+            <button
+              className="btn-primary"
+              style={{ flex: 1 }}
+              onClick={() => {
+                const n = new Set(known);
+                if (n.has(idx)) n.delete(idx); else n.add(idx);
+                setKnown(n);
+              }}
+            >
+              {known.has(idx) ? "★ Known" : "☆ Mark known"}
+            </button>
+            <button className="btn-primary" style={{ flex: 1 }} onClick={next} disabled={idx === total - 1}>Next →</button>
+          </>
+        )}
       </div>
 
       <div className="fc-dots">
         {cards.map((_, i) => (
           <button key={i} className={`fc-dot ${i === idx ? "active" : ""} ${known.has(i) ? "known" : ""}`} onClick={() => { setIdx(i); setFlipped(false); }} aria-label={`Go to card ${i + 1}`} />
         ))}
-      </div>
-
-      <div className="fc-foot">
-        <span className="muted small">{known.size}/{total} marked known • Quizlet style — tap card to flip</span>
-        <button className="btn-primary big" onClick={() => (allSeen || idx === total - 1 ? onDone() : next())}>
-          {allSeen || idx === total - 1 ? "Go to Quiz →" : "Next Card →"}
-        </button>
-        {!allSeen && idx !== total - 1 && <span className="muted small">Tip: flip each card and mark known to unlock quiz faster</span>}
       </div>
     </div>
   );
@@ -148,12 +146,9 @@ function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; cha
         <div className="duo-hearts" aria-label="Hearts">{Array.from({ length: 3 }, (_, idx) => <span key={idx} className={idx < hearts ? "heart alive" : "heart dead"}>{idx < hearts ? "❤️" : "🖤"}</span>)}</div>
       </div>
 
-      <div className="duo-question">
-        <div className="duo-character">🦉</div>
-        <div className="duo-bubble">
-          <div className="duo-prompt">{q.prompt}</div>
-          {q.explanation && checked && <div className="duo-explain">{q.explanation}</div>}
-        </div>
+      <div className="duo-question-top">
+        <div className="duo-prompt">{q.prompt}</div>
+        {q.explanation && checked && <div className="duo-explain">{q.explanation}</div>}
       </div>
 
       <div className="duo-options">
@@ -185,7 +180,7 @@ function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; cha
         {checked ? (i + 1 >= total ? "Finish →" : "Continue →") : "Check"}
       </button>
 
-      <div className="duo-foot muted small">{i + 1} / {total} • Duolingo style — earn hearts by getting correct</div>
+      <div className="duo-foot muted small">{i + 1} / {total}</div>
     </div>
   );
 }
@@ -219,7 +214,6 @@ export function LearnScreen() {
     if (phase === "quiz") {
       return (
         <div className="page">
-          <h1 className="page-title">✏️ Quiz — {lesson.title}</h1>
           <DuolingoQuiz
             lessonId={lesson.id}
             chapterId={chapter.id}

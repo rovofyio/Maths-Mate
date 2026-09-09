@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
-import { PRODUCTS, purchaseProduct, hasPurchase, COIN_PACKS } from "../lib/iap";
-import { addCoins } from "../lib/store";
+import { PRODUCTS, purchaseProduct, hasPurchase, COIN_PACKS, STAR_PACKS } from "../lib/iap";
+import { addCoins, addXp } from "../lib/store";
 import { showToast } from "../lib/toast";
 import type { ProductId } from "../lib/iap";
 
@@ -15,6 +15,9 @@ export function Paywall({ onClose }: { onClose: () => void }) {
         if (COIN_PACKS[id]) {
           addCoins(COIN_PACKS[id]);
           showToast(`🪙 +${COIN_PACKS[id]} coins!`);
+        } else if (STAR_PACKS[id]) {
+          addXp(STAR_PACKS[id]);
+          showToast(`⭐ +${STAR_PACKS[id]} stars!`);
         } else {
           showToast(`${product.emoji} ${product.label} unlocked!`);
         }
@@ -28,7 +31,8 @@ export function Paywall({ onClose }: { onClose: () => void }) {
   };
 
   const entitlements = PRODUCTS.filter((p) => p.kind === "entitlement");
-  const packs = PRODUCTS.filter((p) => p.kind === "consumable");
+  const coinPacks = PRODUCTS.filter((p) => COIN_PACKS[p.id]);
+  const starPacks = PRODUCTS.filter((p) => STAR_PACKS[p.id]);
 
   return (
     <div className="modal-overlay">
@@ -63,10 +67,21 @@ export function Paywall({ onClose }: { onClose: () => void }) {
 
         <h3 className="paywall-h3">Coin packs</h3>
         <div className="coin-packs">
-          {packs.map((p) => (
+          {coinPacks.map((p) => (
             <button key={p.id} className="coin-pack" disabled={busy !== null} onClick={() => buy(p.id)}>
               <span className="coin-pack-emoji">{p.emoji}</span>
               <span className="coin-pack-amount">+{COIN_PACKS[p.id]}</span>
+              <span className="coin-pack-price">{p.price}</span>
+            </button>
+          ))}
+        </div>
+
+        <h3 className="paywall-h3">Star packs</h3>
+        <div className="coin-packs">
+          {starPacks.map((p) => (
+            <button key={p.id} className="coin-pack" disabled={busy !== null} onClick={() => buy(p.id)}>
+              <span className="coin-pack-emoji">{p.emoji}</span>
+              <span className="coin-pack-amount">+{STAR_PACKS[p.id]}</span>
               <span className="coin-pack-price">{p.price}</span>
             </button>
           ))}

@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
-import { setPurchase, addCoins } from "../lib/store";
+import { setPurchase, addCoins, addXp } from "../lib/store";
+import { purchaseProduct, STAR_PACKS } from "../lib/iap";
 import { showToast } from "../lib/toast";
 
 export function SupportModal({ onClose }: { onClose: () => void }) {
@@ -19,6 +20,22 @@ export function SupportModal({ onClose }: { onClose: () => void }) {
     showToast("🪙 +1000 coins!");
     setActioning(false);
     onClose();
+  };
+
+  const handleStars = async () => {
+    setActioning(true);
+    try {
+      const { ok } = await purchaseProduct("stars_500");
+      if (ok && STAR_PACKS.stars_500) {
+        addXp(STAR_PACKS.stars_500);
+        showToast(`⭐ +${STAR_PACKS.stars_500} stars!`);
+        onClose();
+      } else {
+        showToast("Purchase was not completed.");
+      }
+    } finally {
+      setActioning(false);
+    }
   };
 
   return (
@@ -46,6 +63,15 @@ export function SupportModal({ onClose }: { onClose: () => void }) {
             <div className="support-card-blurb">Get 1000 coins instantly</div>
             <button className="btn-primary" disabled={actioning} onClick={handle1000Coins}>
               {actioning ? "..." : "Get Coins"}
+            </button>
+          </div>
+
+          <div className="support-card">
+            <div className="support-card-emoji">⭐</div>
+            <div className="support-card-name">500 Stars</div>
+            <div className="support-card-blurb">Get 500 stars instantly</div>
+            <button className="btn-primary" disabled={actioning} onClick={handleStars}>
+              {actioning ? "..." : "$2.99"}
             </button>
           </div>
 

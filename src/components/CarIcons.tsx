@@ -20,6 +20,8 @@ export function RedSuperCar({ className = "", style = {} }: CarProps) {
       className={`car-png car-rival ${className}`}
       style={{ width: "100%", height: "100%", objectFit: "contain", ...style }}
       draggable={false}
+      loading="lazy"
+      decoding="async"
     />
   );
 }
@@ -37,6 +39,8 @@ export function GreenSuperCar({ className = "", style = {} }: CarProps) {
       className={`car-png car-player ${className}`}
       style={{ width: "100%", height: "100%", objectFit: "contain", ...style }}
       draggable={false}
+      loading="lazy"
+      decoding="async"
     />
   );
 }
