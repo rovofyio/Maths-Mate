@@ -5,6 +5,7 @@ import { evaluateAfterGame } from "../lib/achievements";
 import { showToast } from "../lib/toast";
 import type { CSSProperties } from "preact";
 import { getFlashcardsForLesson, getQuizForLesson, type QuizQ } from "../lib/lessonQuiz";
+import { MathFigure } from "../components/MathFigures";
 
 type View =
   | { kind: "home" }
@@ -148,6 +149,7 @@ function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; cha
 
       <div className="duo-question-top">
         <div className="duo-prompt">{q.prompt}</div>
+        {q.figure && <MathFigure figure={q.figure} />}
         {q.explanation && checked && <div className="duo-explain">{q.explanation}</div>}
       </div>
 

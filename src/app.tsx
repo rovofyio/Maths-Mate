@@ -4,6 +4,7 @@ import { lazy, Suspense } from "preact/compat";
 import { state } from "./lib/store";
 import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
+import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
 import { SupportModal } from "./components/SupportModal";
 import type { Route } from "./types";
 
@@ -47,8 +48,7 @@ export function App() {
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">
-            <span className="brand-icon">🧮</span>
-            <span className="brand-name">Math Aura</span>
+            <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo" draggable={false} />
           </div>
 <div className="topbar-stats">
                <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>

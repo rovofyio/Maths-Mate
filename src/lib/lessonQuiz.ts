@@ -1,4 +1,5 @@
 import type { Lesson } from "../data/chapters";
+import type { QuizFigure } from "../components/MathFigures";
 
 export interface QuizQ {
   id: string;
@@ -6,6 +7,7 @@ export interface QuizQ {
   options: string[];
   answer: string;
   explanation?: string;
+  figure?: QuizFigure;
 }
 
 const ri = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -27,16 +29,16 @@ function distractorsText(ans: string, pool: string[]): string[] {
   while(set.size<4) set.add(ans+" (alt)");
   return shuffle([...set]);
 }
-function mkQ(prompt: string, answer: string|number, opts?: string[], exp?: string): QuizQ {
+function mkQ(prompt: string, answer: string|number, opts?: string[], exp?: string, figure?: QuizFigure): QuizQ {
   const ansStr = String(answer);
   const options = opts ?? distractorsNum(typeof answer==="number"?answer as number: parseInt(ansStr)||0,3);
   // ensure answer in opts
   if(!options.includes(ansStr)){
     const r = shuffle(options);
     r[0]=ansStr;
-    return { id: Math.random().toString(36).slice(2,7), prompt, options: shuffle(r), answer: ansStr, explanation: exp };
+    return { id: Math.random().toString(36).slice(2,7), prompt, options: shuffle(r), answer: ansStr, explanation: exp, figure };
   }
-  return { id: Math.random().toString(36).slice(2,7), prompt, options: shuffle(options), answer: ansStr, explanation: exp };
+  return { id: Math.random().toString(36).slice(2,7), prompt, options: shuffle(options), answer: ansStr, explanation: exp, figure };
 }
 
 // ── per-lesson generators ──
@@ -226,7 +228,249 @@ const gens: Record<string, Gen> = {
   "stats-probability": () => {
     return mkQ(`Roll fair die → P(4)?`, "1/6", distractorsText("1/6",["1/6","1/3","1/2","1/4"]));
   },
+  // ── Geometry advanced ──
+  "geo-adv-angles": () => {
+    const kind = pick(["hex", "pent", "parallel"] as const);
+    if (kind === "parallel") return mkQ(`Parallel lines: one angle is 55°. Its alternate angle is?`, "55°", distractorsText("55°", ["55°", "125°", "35°", "90°"]), "Alternate angles are equal.");
+    const n = kind === "hex" ? 6 : 5;
+    const sum = (n - 2) * 180;
+    return mkQ(`Sum of interior angles of a ${kind === "hex" ? "hexagon" : "pentagon"}?`, sum + "°", distractorsText(sum + "°", ["540°", "720°", "360°", "900°", sum + "°"]), `(${n}−2) × 180° = ${sum}°.`);
+  },
+  "geo-adv-circles": () => {
+    const c = pick([80, 100, 60, 120]);
+    const kind = pick(["centre", "semi"] as const);
+    if (kind === "semi") return mkQ(`Angle in a semicircle is always?`, "90°", distractorsText("90°", ["90°", "180°", "45°", "60°"]), "Thales' theorem: angle in a semicircle is a right angle.");
+    return mkQ(`Centre angle ${c}°. Circumference angle on same arc?`, (c / 2) + "°", distractorsText((c / 2) + "°", [`${c}°`, `${c / 2}°`, `${c * 2}°`, "45°"]), "Circumference = centre ÷ 2.");
+  },
+  "geo-adv-solids": () => {
+    const triples: Array<[number, number, number]> = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [9, 12, 15]];
+    const [a, b, c] = pick(triples);
+    const kind = pick(["hyp", "circle"] as const);
+    if (kind === "circle") {
+      const r = pick([7, 14, 3]);
+      const area = r === 7 ? 154 : r === 14 ? 616 : 28.26;
+      const areaStr = r === 3 ? "28.26 cm²" : `${area} cm²`;
+      return mkQ(`Area of circle radius ${r} cm (π ≈ 22/7)?`, areaStr, distractorsText(areaStr, ["154 cm²", "616 cm²", "44 cm²", "28.26 cm²"]), `πr² = π × ${r}².`);
+    }
+    return mkQ(`Right triangle legs ${a} cm, ${b} cm. Hypotenuse?`, c + " cm", distractorsText(c + " cm", [`${c} cm`, `${a + b} cm`, `${c + 2} cm`, "10 cm"]), `√(${a}² + ${b}²) = ${c}.`);
+  },
+  // ── Trigonometry 1 (always with triangle graphic) ──
+  "trig-basics": () => {
+    const triples: Array<[number, number, number]> = [[3, 4, 5], [5, 12, 13], [6, 8, 10], [9, 12, 15]];
+    const [o, a, h] = pick(triples);
+    const fn = pick(["sin", "cos", "tan"] as const);
+    const fig: QuizFigure = { kind: "triangle", opp: o, adj: a, hyp: h, angleLabel: "θ" };
+    if (fn === "sin") return mkQ(`Look at the triangle. opp = ${o}, hyp = ${h}. Find sin θ.`, `${o}/${h}`, distractorsText(`${o}/${h}`, [`${o}/${h}`, `${a}/${h}`, `${o}/${a}`, `${h}/${o}`]), "sin θ = opposite ÷ hypotenuse.", fig);
+    if (fn === "cos") return mkQ(`Look at the triangle. adj = ${a}, hyp = ${h}. Find cos θ.`, `${a}/${h}`, distractorsText(`${a}/${h}`, [`${a}/${h}`, `${o}/${h}`, `${a}/${o}`, `${h}/${a}`]), "cos θ = adjacent ÷ hypotenuse.", fig);
+    return mkQ(`Look at the triangle. opp = ${o}, adj = ${a}. Find tan θ.`, `${o}/${a}`, distractorsText(`${o}/${a}`, [`${o}/${a}`, `${a}/${o}`, `${o}/${h}`, `${a}/${h}`]), "tan θ = opposite ÷ adjacent.", fig);
+  },
+  "trig-solving": () => {
+    const triples: Array<[number, number, number]> = [[3, 4, 5], [5, 12, 13], [6, 8, 10]];
+    const [o, a, h] = pick(triples);
+    const kind = pick(["side", "angle"] as const);
+    if (kind === "side") {
+      const fig: QuizFigure = { kind: "triangle", opp: o, adj: a, hyp: h, hideSide: "opp" };
+      return mkQ(`The triangle shows adj = ${a}, hyp = ${h}, but opp is hidden (?). If sin θ = ${o}/${h}, find the missing side.`, String(o), distractorsNum(o, 3), `opp = ${h} × ${o}/${h} = ${o}.`, fig);
+    }
+    const fig: QuizFigure = { kind: "triangle", opp: 1, adj: 1, hyp: 1, angleLabel: "θ" };
+    const q = pick([
+      { p: "sin θ = 1/2. Find θ (0°–90°).", ans: "30°", pool: ["30°", "45°", "60°", "90°"] },
+      { p: "cos θ = 1/2. Find θ (0°–90°).", ans: "60°", pool: ["30°", "45°", "60°", "90°"] },
+      { p: "tan θ = 1. Find θ (0°–90°).", ans: "45°", pool: ["30°", "45°", "60°", "90°"] },
+    ]);
+    return mkQ(q.p + " Use the triangle / inverse trig.", q.ans, distractorsText(q.ans, q.pool), "Use sin⁻¹, cos⁻¹ or tan⁻¹.", fig);
+  },
+  "trig-exact": () => {
+    const q = pick([
+      { p: "Find sin 30°.", ans: "1/2", pool: ["1/2", "√2/2", "√3/2", "1"] },
+      { p: "Find cos 60°.", ans: "1/2", pool: ["1/2", "√2/2", "√3/2", "0"] },
+      { p: "Find tan 45°.", ans: "1", pool: ["1", "√3", "1/√3", "0"] },
+      { p: "Find sin 60°.", ans: "√3/2", pool: ["1/2", "√2/2", "√3/2", "1"] },
+      { p: "Find tan 60°.", ans: "√3", pool: ["√3", "1", "1/√3", "√2"] },
+    ]);
+    const fig: QuizFigure = { kind: "triangle", opp: 1, adj: 1, hyp: 2, angleDeg: 30, angleLabel: "30°" };
+    return mkQ(q.p + " (see 30°–60°–90° triangle)", q.ans, distractorsText(q.ans, q.pool), "Memorise 30°/45°/60° exact values.", fig);
+  },
+  // ── Coordinate Geometry 1 (always with coordinate plane) ──
+  "coord-distance": () => {
+    const ax = ri(0, 3), ay = ri(0, 3);
+    const dx = pick([3, 4, 5, 6]), dy = pick([4, 3]);
+    const bx = ax + dx, by = ay + dy;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    const dStr = Number.isInteger(d) ? String(Math.round(d)) : d.toFixed(2);
+    const fig: QuizFigure = { kind: "coordinate", points: [{ x: ax, y: ay, label: `A(${ax}, ${ay})` }, { x: bx, y: by, label: `B(${bx}, ${by})` }], join: true, showRightTriangle: true, xrange: [-1, 8], yrange: [-1, 8] };
+    return mkQ(`Points A(${ax}, ${ay}) and B(${bx}, ${by}) are plotted. Find AB.`, dStr, distractorsNum(Math.round(d), 3), `√(${dx}² + ${dy}²) = √${dx * dx + dy * dy} = ${dStr}.`, fig);
+  },
+  "coord-mid-slope": () => {
+    const kind = pick(["mid", "slope"] as const);
+    const x1 = ri(0, 4), y1 = ri(0, 4), x2 = x1 + ri(2, 4), y2 = y1 + ri(2, 6);
+    if (kind === "mid") {
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const ans = `(${mx}, ${my})`;
+      const fig: QuizFigure = { kind: "coordinate", points: [{ x: x1, y: y1, label: `A(${x1}, ${y1})` }, { x: x2, y: y2, label: `B(${x2}, ${y2})` }], join: true, xrange: [-1, 9], yrange: [-1, 9] };
+      return mkQ(`Find the midpoint of A(${x1}, ${y1}) and B(${x2}, ${y2}) shown on the plane.`, ans, distractorsText(ans, [ans, `(${x1}, ${y1})`, `(${x2}, ${y2})`, `(${(x1 + x2)}, ${(y1 + y2)})`]), "Average the x's and the y's.", fig);
+    }
+    const m = (y2 - y1) / (x2 - x1);
+    const mStr = Number.isInteger(m) ? String(m) : m.toFixed(1);
+    const fig: QuizFigure = { kind: "coordinate", points: [{ x: x1, y: y1, label: `A(${x1}, ${y1})` }, { x: x2, y: y2, label: `B(${x2}, ${y2})` }], join: true, xrange: [-1, 9], yrange: [-1, 10] };
+    return mkQ(`Find the slope between A(${x1}, ${y1}) and B(${x2}, ${y2}) on the plane.`, mStr, distractorsNum(Math.round(m * 2) / 2, 3), `(${y2}−${y1}) ÷ (${x2}−${x1}) = ${mStr}.`, fig);
+  },
+  "coord-line": () => {
+    const m = pick([2, 3, -2, 1]);
+    const c = pick([3, -5, 1, 4]);
+    const kind = pick(["eq", "intercept"] as const);
+    const x1 = 1, y1 = m * 1 + c, x2 = 4, y2 = m * 4 + c;
+    const fig: QuizFigure = { kind: "coordinate", points: [{ x: Math.max(0, x1), y: Math.max(0, y1), label: `(${x1}, ${y1})` }, { x: x2, y: Math.max(0, y2), label: `(${x2}, ${y2})` }], join: true, xrange: [-1, 6], yrange: [-6, 10] };
+    if (kind === "eq") {
+      const ans = `y = ${m}x ${c >= 0 ? "+ " + c : "− " + Math.abs(c)}`;
+      return mkQ(`Line through the plotted points has slope ${m} and y-intercept ${c}. Its equation?`, ans, distractorsText(ans, [ans, `y = ${m}x + 0`, `x = ${m}y + ${c}`, `y = ${c}x + ${m}`]), "y = mx + c.", fig);
+    }
+    return mkQ(`What is the y-intercept of y = ${m}x ${c >= 0 ? "+ " + c : "− " + Math.abs(c)}? (see plotted line)`, String(c), distractorsNum(c, 3), "c is where x = 0.", fig);
+  },
+  // ── Statistics advanced ──
+  "stats-central": () => {
+    const kind = pick(["median", "grouped"] as const);
+    if (kind === "median") return mkQ(`Data: 2, 3, 3, 5, 20. Find the median.`, "3", distractorsNum(3, 3), "Sort, then take the middle.", { kind: "bars", values: [2, 3, 3, 5, 20], labels: ["a", "b", "c", "d", "e"] });
+    return mkQ(`Estimate mean: value 10 occurs ×2, value 20 occurs ×3.`, "16", distractorsNum(16, 3), "(20 + 60) ÷ 5 = 16.", { kind: "bars", values: [2, 3], labels: ["10", "20"] });
+  },
+  "stats-spread": () => {
+    const kind = pick(["range", "sd"] as const);
+    if (kind === "range") {
+      const a = [4, 8, 6, 10];
+      return mkQ(`Find the range of ${a.join(", ")}.`, "6", distractorsNum(6, 3), "max − min = 10 − 4.", { kind: "bars", values: a, labels: ["a", "b", "c", "d"] });
+    }
+    return mkQ(`Variance = 4. Standard deviation = ?`, "2", distractorsNum(2, 3), "SD = √variance.", { kind: "bars", values: [2, 4, 4, 5, 7], labels: ["1", "2", "3", "4", "5"] });
+  },
+  "stats-charts": () => {
+    const kind = pick(["iqr", "density"] as const);
+    if (kind === "iqr") return mkQ(`Box plot: Q1 = 10, Q3 = 22. IQR = ?`, "12", distractorsNum(12, 3), "Q3 − Q1 = 12.", { kind: "bars", values: [10, 12, 22], labels: ["Q1", "IQR", "Q3"] });
+    return mkQ(`Histogram bar 0–10 has frequency 20. Frequency density?`, "2", distractorsNum(2, 3), "20 ÷ 10 = 2.", { kind: "bars", values: [20], labels: ["0-10"] });
+  },
+  // ── Trigonometry 2 ──
+  "trig2-compound": () => {
+    const kind = pick(["sin", "cos"] as const);
+    if (kind === "sin") return mkQ(`Expand sin(A + B).`, "sin A cos B + cos A sin B", distractorsText("sin A cos B + cos A sin B", ["sin A cos B + cos A sin B", "cos A cos B − sin A sin B", "sin A sin B + cos A cos B", "(tan A + tan B)/(1 − tan A tan B)"]), "Keep the + sign, mix sin and cos.", { kind: "wave", fn: "sin" });
+    return mkQ(`cos 75° with 45° + 30° equals?`, "cos45°cos30° − sin45°sin30°", distractorsText("cos45°cos30° − sin45°sin30°", ["cos45°cos30° − sin45°sin30°", "cos45°cos30° + sin45°sin30°", "sin45°cos30° + cos45°sin30°", "1"]), "cos(A+B) = cosAcosB − sinAsinB.", { kind: "wave", fn: "cos" });
+  },
+  "trig2-double": () => {
+    const kind = pick(["sin2", "pyth"] as const);
+    if (kind === "pyth") return mkQ(`Simplify sin²θ + cos²θ.`, "1", distractorsText("1", ["1", "0", "2", "sin 2θ"]), "Pythagorean identity.", { kind: "wave", fn: "sin" });
+    return mkQ(`sin A = 3/5, cos A = 4/5. Find sin 2A.`, "24/25", distractorsText("24/25", ["24/25", "12/25", "7/25", "1"]), "2 × 3/5 × 4/5.", { kind: "triangle", opp: 3, adj: 4, hyp: 5, angleLabel: "A" });
+  },
+  "trig2-inverse": () => {
+    const q = pick([
+      { p: "Find sin⁻¹(1/2) in [0°, 90°].", ans: "30°", pool: ["30°", "45°", "60°", "90°"] },
+      { p: "Solve sin θ = 1/2 for 0° ≤ θ < 360°.", ans: "30°, 150°", pool: ["30°, 150°", "30° only", "150°, 210°", "60°, 120°"] },
+      { p: "Find cos⁻¹(0) in [0°, 180°].", ans: "90°", pool: ["90°", "0°", "180°", "45°"] },
+    ]);
+    return mkQ(q.p, q.ans, distractorsText(q.ans, q.pool), "Use the unit circle / CAST quadrants.", { kind: "wave", fn: "sin" });
+  },
+  // ── Coordinate Geometry 2: circles (always with circle graphic) ──
+  "circle-eq": () => {
+    const kind = pick(["origin", "shifted"] as const);
+    if (kind === "origin") {
+      const r = pick([5, 4, 6]);
+      return mkQ(`Circle centre (0, 0), radius ${r} is plotted. Its equation?`, `x² + y² = ${r * r}`, distractorsText(`x² + y² = ${r * r}`, [`x² + y² = ${r * r}`, `x² + y² = ${r}`, `(x − ${r})² + y² = 25`, `x + y = ${r}`]), "x² + y² = r².", { kind: "circle", center: { x: 0, y: 0 }, radius: r });
+    }
+    const h = pick([2, -1, 3]), k = pick([-1, 2, 1]), r = 3;
+    const yPart = k >= 0 ? `(y − ${k})` : `(y + ${Math.abs(k)})`;
+    const ans = `(x − ${h})² + ${yPart}² = 9`;
+    return mkQ(`Circle centre (${h}, ${k}), radius ${r} is plotted. Its equation?`, ans, distractorsText(ans, [ans, `x² + y² = 9`, `(x + ${h})² + (y + ${k})² = 9`, `(x − ${h})² + ${yPart}² = 3`]), "(x − h)² + (y − k)² = r².", { kind: "circle", center: { x: h, y: k }, radius: r });
+  },
+  "circle-tangent": () => {
+    const kind = pick(["eq", "slope"] as const);
+    if (kind === "eq") return mkQ(`Circle x² + y² = 25. Tangent at (3, 4) is plotted. Its equation?`, "3x + 4y = 25", distractorsText("3x + 4y = 25", ["3x + 4y = 25", "4x + 3y = 25", "x + y = 5", "3x − 4y = 25"]), "xx₁ + yy₁ = r².", { kind: "circle", center: { x: 0, y: 0 }, radius: 5, point: { x: 3, y: 4, label: "P(3, 4)" } });
+    return mkQ(`Radius slope to (3, 4) is 4/3 (see diagram). Tangent slope?`, "-3/4", distractorsText("-3/4", ["-3/4", "4/3", "3/4", "-4/3"]), "Perpendicular: m₁m₂ = −1.", { kind: "circle", center: { x: 0, y: 0 }, radius: 5, point: { x: 3, y: 4, label: "P(3, 4)" } });
+  },
+  "circle-pos": () => {
+    const kind = pick(["inside", "touches"] as const);
+    if (kind === "inside") return mkQ(`Point (1, 1) vs circle x² + y² = 25 (see diagram). Inside, on, or outside?`, "inside", distractorsText("inside", ["inside", "on", "outside", "tangent"]), "1 + 1 = 2 < 25.", { kind: "circle", center: { x: 0, y: 0 }, radius: 5, point: { x: 1, y: 1, label: "P(1, 1)" } });
+    return mkQ(`How many times does a tangent touch its circle? (see diagram)`, "once", distractorsText("once", ["once", "twice", "never", "three times"]), "Discriminant = 0.", { kind: "circle", center: { x: 0, y: 0 }, radius: 4, point: { x: 4, y: 0, label: "T(4, 0)" } });
+  },
+  // ── Probability advanced ──
+  "prob-rules": () => {
+    const kind = pick(["complement", "both"] as const);
+    if (kind === "complement") return mkQ(`P(rain) = 0.3. P(no rain)?`, "0.7", distractorsText("0.7", ["0.7", "0.3", "1.3", "0"]), "1 − 0.3.");
+    return mkQ(`Two fair coins. P(both heads)?`, "1/4", distractorsText("1/4", ["1/4", "1/2", "3/4", "1/3"]), "1/2 × 1/2.");
+  },
+  "prob-conditional": () => {
+    const kind = pick(["norep", "cond"] as const);
+    if (kind === "norep") return mkQ(`Bag 3 red, 2 blue. Two picks, no replacement. P(both red)?`, "3/10", distractorsText("3/10", ["3/10", "9/25", "1/2", "3/5"]), "3/5 × 2/4 = 3/10.");
+    return mkQ(`P(A and B) = 0.2, P(B) = 0.5. P(A|B)?`, "0.4", distractorsText("0.4", ["0.4", "0.1", "0.7", "2.5"]), "0.2 ÷ 0.5.");
+  },
+  "prob-expected": () => {
+    const kind = pick(["game", "binom"] as const);
+    if (kind === "game") return mkQ(`Game pays £10 with prob 0.2 else £0. Expected value?`, "£2", distractorsText("£2", ["£2", "£5", "£10", "£0.20"]), "10 × 0.2 = 2.");
+    const n = pick([10, 20]), p = 0.8;
+    return mkQ(`${n} free throws, p = 0.8 each. Expected makes?`, String(Math.round(n * p)), distractorsNum(Math.round(n * p), 3), "n × p.");
+  },
+  // ── Sequences & series ──
+  "seq-arithmetic": () => {
+    const a = ri(2, 6), d = ri(2, 5);
+    const n = pick([10, 8, 12]);
+    const ans = a + (n - 1) * d;
+    const kind = pick(["nth", "sum"] as const);
+    if (kind === "nth") return mkQ(`AP starts ${a}, ${a + d}, ${a + 2 * d}… Find term ${n}.`, ans, distractorsNum(ans, 3), `${a} + ${n - 1}×${d} = ${ans}.`);
+    return mkQ(`Sum 1 + 2 + … + 100 = ?`, "5050", distractorsNum(5050, 3), "100/2 × 101.");
+  },
+  "seq-geometric": () => {
+    const kind = pick(["nth", "inf"] as const);
+    if (kind === "nth") return mkQ(`GP: 2, 6, 18… Find the 5th term.`, "162", distractorsNum(162, 3), "2 × 3⁴ = 162.");
+    return mkQ(`1 + 1/2 + 1/4 + … to infinity = ?`, "2", distractorsText("2", ["2", "1", "3", "∞"]), "1/(1 − 1/2) = 2.");
+  },
+  "seq-special": () => {
+    const kind = pick(["fib", "tri"] as const);
+    if (kind === "fib") return mkQ(`Fibonacci: 1, 1, 2, 3, 5, 8… next?`, "13", distractorsNum(13, 3), "5 + 8 = 13.");
+    const n = pick([5, 6, 7]);
+    const ans = (n * (n + 1)) / 2;
+    return mkQ(`Find the ${n}th triangular number.`, ans, distractorsNum(ans, 3), `${n}×${n + 1}/2 = ${ans}.`);
+  },
+  // ── Integration calculus ──
+  "int-basics": () => {
+    const kind = pick(["x2", "3x"] as const);
+    if (kind === "x2") return mkQ(`Find ∫x² dx.`, "x³/3 + C", distractorsText("x³/3 + C", ["x³/3 + C", "2x + C", "x²/2 + C", "3x² + C"]), "Add 1 to power, divide.");
+    return mkQ(`Find ∫3x dx.`, "3x²/2 + C", distractorsText("3x²/2 + C", ["3x²/2 + C", "3 + C", "x² + C", "6x + C"]), "3 × x²/2.");
+  },
+  "int-definite": () => {
+    const kind = pick(["x", "const"] as const);
+    if (kind === "x") return mkQ(`Evaluate ∫₀¹ x dx.`, "1/2", distractorsText("1/2", ["1/2", "1", "2", "0"]), "[x²/2]₀¹ = 1/2.");
+    return mkQ(`Evaluate ∫₀² 3 dx.`, "6", distractorsNum(6, 3), "[3x]₀² = 6.");
+  },
+  "int-apply": () => {
+    const kind = pick(["area", "motion"] as const);
+    if (kind === "area") return mkQ(`Area under y = x from 0 to 4 = ∫₀⁴ x dx = ?`, "8", distractorsNum(8, 3), "[x²/2]₀⁴ = 8.");
+    return mkQ(`v = 2t. Displacement t = 0 → 3 = ∫₀³ 2t dt = ?`, "9", distractorsNum(9, 3), "[t²]₀³ = 9.");
+  },
 };
+
+/** Default figures so EVERY question in visual lessons shows a graphic, even example-based ones. */
+function defaultFigureFor(lessonId: string): QuizFigure | undefined {
+  switch (lessonId) {
+    case "trig-basics":
+    case "trig-solving":
+      return { kind: "triangle", opp: 3, adj: 4, hyp: 5, angleLabel: "θ" };
+    case "trig-exact":
+      return { kind: "triangle", opp: 1, adj: 1, hyp: 2, angleDeg: 30, angleLabel: "30°" };
+    case "coord-distance":
+      return { kind: "coordinate", points: [{ x: 1, y: 2, label: "A(1, 2)" }, { x: 4, y: 6, label: "B(4, 6)" }], join: true, showRightTriangle: true, xrange: [-1, 7], yrange: [-1, 8] };
+    case "coord-mid-slope":
+      return { kind: "coordinate", points: [{ x: 2, y: 4, label: "A(2, 4)" }, { x: 6, y: 10 - 2, label: "B(6, 8)" }], join: true, xrange: [-1, 8], yrange: [-1, 10] };
+    case "coord-line":
+      return { kind: "coordinate", points: [{ x: 0, y: 3, label: "(0, 3)" }, { x: 3, y: 9 - 2, label: "(3, 7)" }], join: true, xrange: [-1, 6], yrange: [-2, 10] };
+    case "circle-eq":
+      return { kind: "circle", center: { x: 0, y: 0 }, radius: 5 };
+    case "circle-tangent":
+      return { kind: "circle", center: { x: 0, y: 0 }, radius: 5, point: { x: 3, y: 4, label: "P(3, 4)" } };
+    case "circle-pos":
+      return { kind: "circle", center: { x: 0, y: 0 }, radius: 5, point: { x: 1, y: 1, label: "P(1, 1)" } };
+    case "trig2-compound":
+    case "trig2-double":
+    case "trig2-inverse":
+      return { kind: "wave", fn: "sin" };
+    default:
+      return undefined;
+  }
+}
 
 export function getQuizForLesson(lesson: Lesson, count=5): QuizQ[] {
   const g = gens[lesson.id];
@@ -244,7 +488,7 @@ export function getQuizForLesson(lesson: Lesson, count=5): QuizQ[] {
       const pool = lesson.examples.map(e=>e.a).concat(["Unknown","None","42"]);
       opts = distractorsText(ans, pool);
     }
-    qs.push({ id: Math.random().toString(36).slice(2,7), prompt: ex.q, options: shuffle(opts.includes(ans)?opts:[ans, ...opts.slice(0,3)]), answer: ans, explanation: ex.s.join(" ") });
+    qs.push({ id: Math.random().toString(36).slice(2,7), prompt: ex.q, options: shuffle(opts.includes(ans)?opts:[ans, ...opts.slice(0,3)]), answer: ans, explanation: ex.s.join(" "), figure: defaultFigureFor(lesson.id) });
   }
   while(qs.length<count){
     if(g){

@@ -543,6 +543,438 @@ export const CHAPTERS: Chapter[] = [
       },
     ],
   },
+  {
+    id: "geometry-adv",
+    title: "Geometry",
+    emoji: "📐",
+    color: "#16a085",
+    blurb: "Angles, polygons, circle theorems and 3D solids.",
+    lessons: [
+      {
+        id: "geo-adv-angles",
+        title: "Angles & Polygons",
+        keyPoints: [
+          "Angles on a straight line add to 180°. Angles around a point add to 360°. Vertically opposite angles are equal.",
+          "Parallel lines: alternate angles are equal, co-interior angles add to 180°, corresponding angles are equal.",
+          "Interior angles of an n-sided polygon add to (n − 2) × 180°. Each interior angle of a regular n-gon is (n−2)×180° ÷ n.",
+        ],
+        examples: [
+          { q: "Two parallel lines cut by a transversal make a 55° alternate angle. Find its alternate pair.", s: ["Alternate angles are equal.", "So the other angle is also 55°."], a: "55°" },
+          { q: "Find the sum of interior angles of a hexagon.", s: ["Sum = (n − 2) × 180°.", "(6 − 2) × 180° = 720°."], a: "720°" },
+        ],
+      },
+      {
+        id: "geo-adv-circles",
+        title: "Circle Theorems",
+        keyPoints: [
+          "The angle at the centre is twice the angle at the circumference standing on the same arc.",
+          "Angles in the same segment are equal. The angle in a semicircle is always 90°.",
+          "A tangent is perpendicular to the radius at the point of contact. Tangents from one external point are equal in length.",
+        ],
+        examples: [
+          { q: "The angle at the centre is 80°. What is the angle at the circumference on the same arc?", s: ["Centre = 2 × circumference.", "80° ÷ 2 = 40°."], a: "40°" },
+          { q: "A triangle drawn in a semicircle has hypotenuse 10 cm as diameter. One angle at the circumference is?", s: ["Angle in a semicircle is a right angle.", "So it is 90°."], a: "90°" },
+        ],
+      },
+      {
+        id: "geo-adv-solids",
+        title: "Area, Pythagoras & Solids",
+        keyPoints: [
+          "Pythagoras: a² + b² = c² for a right-angled triangle, where c is the hypotenuse.",
+          "Area of trapezium = ½ × (a + b) × h. Circumference = 2πr, area of circle = πr².",
+          "Volume of prism = area of cross-section × length. Volume of cylinder = πr²h.",
+        ],
+        examples: [
+          { q: "Right triangle legs 3 cm and 4 cm. Find the hypotenuse.", s: ["c² = 3² + 4² = 9 + 16 = 25.", "c = √25 = 5."], a: "5 cm" },
+          { q: "Find the area of a circle with radius 7 cm (use π = 22/7).", s: ["Area = πr² = 22/7 × 49.", "= 22 × 7 = 154."], a: "154 cm²" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "trig",
+    title: "Trigonometry",
+    emoji: "📏",
+    color: "#e17055",
+    blurb: "Right-angled triangles: sin, cos, tan and real-life angles.",
+    lessons: [
+      {
+        id: "trig-basics",
+        title: "SOH CAH TOA",
+        keyPoints: [
+          "sin θ = opposite ÷ hypotenuse, cos θ = adjacent ÷ hypotenuse, tan θ = opposite ÷ adjacent.",
+          "Label sides relative to the angle θ: opposite is across from θ, adjacent is next to θ (not the hypotenuse).",
+          "Use the diagram: for a 3-4-5 triangle with θ opposite side 3, sin θ = 3/5, cos θ = 4/5, tan θ = 3/4.",
+        ],
+        examples: [
+          { q: "In a right triangle, opposite = 3 and hypotenuse = 5. Find sin θ.", s: ["sin θ = opposite ÷ hypotenuse.", "sin θ = 3/5."], a: "3/5" },
+          { q: "Adjacent = 4, hypotenuse = 5. Find cos θ.", s: ["cos θ = adjacent ÷ hypotenuse.", "cos θ = 4/5."], a: "4/5" },
+        ],
+      },
+      {
+        id: "trig-solving",
+        title: "Finding Sides & Angles",
+        keyPoints: [
+          "To find a missing side: cover it in SOH CAH TOA, then multiply or divide. E.g. opposite = hypotenuse × sin θ.",
+          "To find a missing angle: use inverse trig, e.g. θ = sin⁻¹(opposite ÷ hypotenuse).",
+          "Always check: hypotenuse is the longest side, and angles add to 180°.",
+        ],
+        examples: [
+          { q: "Hypotenuse = 10, θ = 30°. Find the opposite side.", s: ["opposite = 10 × sin 30°.", "sin 30° = 0.5, so opposite = 5."], a: "5" },
+          { q: "Opposite = 5, hypotenuse = 10. Find θ.", s: ["sin θ = 5/10 = 0.5.", "θ = sin⁻¹(0.5) = 30°."], a: "30°" },
+        ],
+      },
+      {
+        id: "trig-exact",
+        title: "Exact Values & Elevation",
+        keyPoints: [
+          "Memorise: sin 30° = 1/2, sin 45° = √2/2, sin 60° = √3/2; cos mirrors them; tan 30° = 1/√3, tan 45° = 1, tan 60° = √3.",
+          "Angle of elevation = looking up from horizontal. Angle of depression = looking down from horizontal.",
+          "Draw the right triangle first, label the known side and angle, then pick SOH CAH TOA.",
+        ],
+        examples: [
+          { q: "Find tan 45°.", s: ["tan 45° = opposite ÷ adjacent for an isosceles right triangle.", "Both legs equal, so tan = 1."], a: "1" },
+          { q: "A ladder leans so the angle of elevation is 60°. The adjacent ground side is 2 m. Find the ladder length (hypotenuse).", s: ["cos 60° = adjacent ÷ hypotenuse = 1/2.", "hypotenuse = 2 ÷ 0.5 = 4."], a: "4 m" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "coord1",
+    title: "Coordinate Geometry",
+    emoji: "📍",
+    color: "#0984e3",
+    blurb: "The coordinate plane: distance, midpoint, slope and lines.",
+    lessons: [
+      {
+        id: "coord-distance",
+        title: "The Plane & Distance",
+        keyPoints: [
+          "Points are (x, y): x runs left–right, y runs bottom–top. The origin (0,0) is where axes cross.",
+          "Distance between A(x₁,y₁) and B(x₂,y₂) is √[(x₂−x₁)² + (y₂−y₁)²] — Pythagoras on the plane.",
+          "See the diagram: the segment AB is the hypotenuse of a right triangle with legs |Δx| and |Δy|.",
+        ],
+        examples: [
+          { q: "Find the distance between (0, 0) and (3, 4).", s: ["Δx = 3, Δy = 4.", "distance = √(9 + 16) = √25 = 5."], a: "5" },
+          { q: "Points A(1, 2) and B(4, 6) are plotted. Find AB.", s: ["Δx = 3, Δy = 4.", "AB = √(9+16) = 5."], a: "5" },
+        ],
+      },
+      {
+        id: "coord-mid-slope",
+        title: "Midpoint & Slope",
+        keyPoints: [
+          "Midpoint M = ((x₁+x₂)/2, (y₁+y₂)/2) — average the x's and average the y's.",
+          "Slope (gradient) m = (y₂−y₁) ÷ (x₂−x₁) = rise ÷ run. Positive slopes go uphill left-to-right.",
+          "Parallel lines share the same slope. Perpendicular slopes multiply to −1.",
+        ],
+        examples: [
+          { q: "Find the midpoint of (2, 4) and (6, 10).", s: ["x: (2+6)/2 = 4.", "y: (4+10)/2 = 7."], a: "(4, 7)" },
+          { q: "Find the slope between (1, 2) and (5, 10).", s: ["rise = 8, run = 4.", "m = 8 ÷ 4 = 2."], a: "2" },
+        ],
+      },
+      {
+        id: "coord-line",
+        title: "Equation of a Line",
+        keyPoints: [
+          "Slope-intercept form: y = mx + c, where m is slope and c is the y-intercept (where x = 0).",
+          "To find the equation: first find m from two points, then substitute one point to solve for c.",
+          "Horizontal lines are y = constant (m = 0). Vertical lines are x = constant (undefined slope).",
+        ],
+        examples: [
+          { q: "Line has slope 2 and passes through (0, 3). Write its equation.", s: ["y = mx + c with m = 2, c = 3.", "y = 2x + 3."], a: "y = 2x + 3" },
+          { q: "Find the y-intercept of y = 3x − 5.", s: ["Compare with y = mx + c.", "c = −5."], a: "-5" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "stats2",
+    title: "Statistics",
+    emoji: "📊",
+    color: "#8e44ad",
+    blurb: "Summarise data: centres, spread and charts.",
+    lessons: [
+      {
+        id: "stats-central",
+        title: "Averages Revisited",
+        keyPoints: [
+          "Mean is sensitive to outliers; median (middle after sorting) resists them.",
+          "For grouped data, estimate the mean with midpoints: Σ(f × midpoint) ÷ Σf.",
+          "Mode = most frequent class or value. Choose median for skewed pay/house-price data.",
+        ],
+        examples: [
+          { q: "Data: 2, 3, 3, 5, 20. Which is better: mean or median?", s: ["Mean = 33/5 = 6.6, pulled up by 20.", "Median = 3, more typical."], a: "median (3)" },
+          { q: "Estimate the mean: values 10 (×2) and 20 (×3).", s: ["Σfx = 20 + 60 = 80, Σf = 5.", "80 ÷ 5 = 16."], a: "16" },
+        ],
+      },
+      {
+        id: "stats-spread",
+        title: "Range, Variance & SD",
+        keyPoints: [
+          "Range = max − min (quick spread). Interquartile range IQR = Q3 − Q1 (middle 50% spread).",
+          "Variance = average of squared differences from the mean. Standard deviation = √variance.",
+          "Small SD means data clusters near the mean; large SD means it spreads out.",
+        ],
+        examples: [
+          { q: "Data 4, 8, 6, 10. Find the range.", s: ["max = 10, min = 4.", "10 − 4 = 6."], a: "6" },
+          { q: "Data 2, 4, 4, 4, 5, 5, 7, 9 has mean 5 and variance 4. Find the SD.", s: ["SD = √variance.", "√4 = 2."], a: "2" },
+        ],
+      },
+      {
+        id: "stats-charts",
+        title: "Histograms & Box Plots",
+        keyPoints: [
+          "Histograms show frequency over continuous intervals; bar area (not just height) matters when widths differ.",
+          "A box plot shows min, Q1, median, Q3, max — the box holds the middle 50%.",
+          "Cumulative frequency graphs let you read off medians and quartiles by going up to the curve then across.",
+        ],
+        examples: [
+          { q: "A box plot has Q1 = 10 and Q3 = 22. Find the IQR.", s: ["IQR = Q3 − Q1.", "22 − 10 = 12."], a: "12" },
+          { q: "A histogram bar covers 0–10 with frequency 20. What is the frequency density?", s: ["density = frequency ÷ width.", "20 ÷ 10 = 2."], a: "2" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "trig2",
+    title: "Trigonometry 2",
+    emoji: "🔺",
+    color: "#d35400",
+    blurb: "Identities, compound & double angles, inverse trig.",
+    lessons: [
+      {
+        id: "trig2-compound",
+        title: "Compound Angles",
+        keyPoints: [
+          "sin(A ± B) = sin A cos B ± cos A sin B. cos(A ± B) = cos A cos B ∓ sin A sin B.",
+          "tan(A ± B) = (tan A ± tan B) ÷ (1 ∓ tan A tan B). Watch the sign flip for cos and the denominator.",
+          "Use these to find exact values, e.g. sin 75° = sin(45° + 30°).",
+        ],
+        examples: [
+          { q: "Expand sin(A + B).", s: ["sin(A+B) = sin A cos B + cos A sin B."], a: "sin A cos B + cos A sin B" },
+          { q: "Write cos 75° using 45° and 30°.", s: ["75° = 45° + 30°.", "cos75° = cos45°cos30° − sin45°sin30°."], a: "cos45°cos30° − sin45°sin30°" },
+        ],
+      },
+      {
+        id: "trig2-double",
+        title: "Double-Angle & Products",
+        keyPoints: [
+          "sin 2A = 2 sin A cos A. cos 2A = cos²A − sin²A = 2cos²A − 1 = 1 − 2sin²A. tan 2A = 2tan A ÷ (1 − tan²A).",
+          "Product-to-sum: sin X cos Y = ½[sin(X+Y) + sin(X−Y)]. Sum-to-product: sin P + sin Q = 2 sin((P+Q)/2) cos((P−Q)/2).",
+          "Pythagorean identity: sin²θ + cos²θ = 1. Also 1 + tan²θ = sec²θ.",
+        ],
+        examples: [
+          { q: "If sin A = 3/5, find sin 2A given cos A = 4/5.", s: ["sin 2A = 2 sin A cos A.", "2 × 3/5 × 4/5 = 24/25."], a: "24/25" },
+          { q: "Simplify sin²θ + cos²θ.", s: ["Pythagorean identity.", "Always equals 1."], a: "1" },
+        ],
+      },
+      {
+        id: "trig2-inverse",
+        title: "Inverse Trig & Equations",
+        keyPoints: [
+          "Inverse trig undoes trig: if sin θ = x then θ = sin⁻¹x. Principal ranges: sin⁻¹ → [−90°, 90°], cos⁻¹ → [0°, 180°], tan⁻¹ → (−90°, 90°).",
+          "Trig equations have many solutions: e.g. sin θ = 1/2 gives θ = 30°, 150°, 390°, … Use CAST / the unit circle.",
+          "For 0° ≤ θ < 360°, solve by finding the reference angle then placing it in the correct quadrants.",
+        ],
+        examples: [
+          { q: "Find sin⁻¹(1/2) in [0°, 90°].", s: ["sin 30° = 1/2.", "So sin⁻¹(1/2) = 30°."], a: "30°" },
+          { q: "Solve sin θ = 1/2 for 0° ≤ θ < 360°.", s: ["Reference angle 30°.", "sin positive in Q1 and Q2: 30°, 150°."], a: "30°, 150°" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "coord2",
+    title: "Coordinate Geometry 2 – Circles",
+    emoji: "⭕",
+    color: "#0097e6",
+    blurb: "Circles on the plane: equations, tangents and chords.",
+    lessons: [
+      {
+        id: "circle-eq",
+        title: "Equation of a Circle",
+        keyPoints: [
+          "Centre (h, k), radius r: (x − h)² + (y − k)² = r². Centre at origin: x² + y² = r².",
+          "General form: x² + y² + 2gx + 2fy + c = 0 has centre (−g, −f) and radius √(g² + f² − c).",
+          "Complete the square to go from general form to centre–radius form. The diagram shows centre and radius on the plane.",
+        ],
+        examples: [
+          { q: "Write the equation of a circle with centre (0, 0) and radius 5.", s: ["x² + y² = r².", "x² + y² = 25."], a: "x² + y² = 25" },
+          { q: "Centre (2, −1), radius 3. Write the equation.", s: ["(x − 2)² + (y + 1)² = 9."], a: "(x − 2)² + (y + 1)² = 9" },
+        ],
+      },
+      {
+        id: "circle-tangent",
+        title: "Tangents & Chords",
+        keyPoints: [
+          "Radius to a tangent is perpendicular: slope(radius) × slope(tangent) = −1.",
+          "Equation of tangent at (x₁, y₁) on x² + y² = r² is xx₁ + yy₁ = r².",
+          "The perpendicular from the centre bisects any chord.",
+        ],
+        examples: [
+          { q: "Circle x² + y² = 25. Find the tangent at (3, 4).", s: ["Use xx₁ + yy₁ = r².", "3x + 4y = 25."], a: "3x + 4y = 25" },
+          { q: "Radius to point (3, 4) has slope 4/3. What is the tangent's slope?", s: ["Perpendicular: m = −1 ÷ (4/3).", "m = −3/4."], a: "-3/4" },
+        ],
+      },
+      {
+        id: "circle-pos",
+        title: "Points, Lines & Circles",
+        keyPoints: [
+          "Plug a point into the left side: < r² means inside, = r² means on, > r² means outside the circle.",
+          "A line meets a circle in 0, 1 (tangent) or 2 (secant) points — substitute y = mx + c and check the discriminant.",
+          "Distance from centre to line < r means the line cuts the circle twice.",
+        ],
+        examples: [
+          { q: "Is (1, 1) inside x² + y² = 25?", s: ["1 + 1 = 2 < 25.", "Yes, inside."], a: "inside" },
+          { q: "How many times does a tangent touch a circle?", s: ["Exactly once.", "Discriminant = 0."], a: "once" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "prob2",
+    title: "Probability",
+    emoji: "🎲",
+    color: "#e84393",
+    blurb: "Rules, trees, conditional chance and expected value.",
+    lessons: [
+      {
+        id: "prob-rules",
+        title: "Addition & Multiplication",
+        keyPoints: [
+          "Complement: P(not A) = 1 − P(A). Mutually exclusive: P(A or B) = P(A) + P(B).",
+          "General addition: P(A or B) = P(A) + P(B) − P(A and B).",
+          "Independent events: P(A and B) = P(A) × P(B). With replacement = independent; without = dependent.",
+        ],
+        examples: [
+          { q: "P(rain) = 0.3. Find P(no rain).", s: ["1 − 0.3 = 0.7."], a: "0.7" },
+          { q: "Flip two fair coins. P(both heads)?", s: ["1/2 × 1/2 = 1/4."], a: "1/4" },
+        ],
+      },
+      {
+        id: "prob-conditional",
+        title: "Conditional & Trees",
+        keyPoints: [
+          "Conditional: P(A|B) = P(A and B) ÷ P(B) — 'given B happened'.",
+          "Tree diagrams: multiply along branches, add across mutually exclusive paths.",
+          "Without replacement, denominators shrink: e.g. 5/8 then 4/7.",
+        ],
+        examples: [
+          { q: "Bag: 3 red, 2 blue. Pick two without replacement. P(both red)?", s: ["3/5 × 2/4 = 6/20.", "= 3/10."], a: "3/10" },
+          { q: "P(A and B) = 0.2, P(B) = 0.5. Find P(A|B).", s: ["0.2 ÷ 0.5 = 0.4."], a: "0.4" },
+        ],
+      },
+      {
+        id: "prob-expected",
+        title: "Expected Value & Binomial",
+        keyPoints: [
+          "Expected value E = Σ(x × P(x)) — the long-run average per trial.",
+          "Binomial: n fixed trials, two outcomes, constant p. P(k wins) = C(n,k) pᵏ (1−p)ⁿ⁻ᵏ.",
+          "Expected wins in binomial = n × p.",
+        ],
+        examples: [
+          { q: "Game pays £10 with probability 0.2 else £0. Find expected value.", s: ["10 × 0.2 + 0 × 0.8 = 2."], a: "£2" },
+          { q: "Shoot 10 free throws with p = 0.8. Expected makes?", s: ["n × p = 10 × 0.8.", "= 8."], a: "8" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "seq",
+    title: "Sequences & Series",
+    emoji: "🔢",
+    color: "#e67e22",
+    blurb: "Arithmetic, geometric and special number patterns.",
+    lessons: [
+      {
+        id: "seq-arithmetic",
+        title: "Arithmetic Sequences",
+        keyPoints: [
+          "Arithmetic (AP): add fixed d each time. nth term: aₙ = a + (n − 1)d.",
+          "Sum of first n terms: Sₙ = n/2 × [2a + (n−1)d] = n/2 × (first + last).",
+          "Check d by subtracting neighbours: 5, 9, 13… has d = 4.",
+        ],
+        examples: [
+          { q: "AP: 3, 7, 11, … Find the 10th term.", s: ["a = 3, d = 4.", "a₁₀ = 3 + 9×4 = 39."], a: "39" },
+          { q: "Sum 1 + 2 + … + 100.", s: ["S = 100/2 × (1 + 100).", "= 50 × 101 = 5050."], a: "5050" },
+        ],
+      },
+      {
+        id: "seq-geometric",
+        title: "Geometric Sequences",
+        keyPoints: [
+          "Geometric (GP): multiply by fixed r each time. nth term: aₙ = a·rⁿ⁻¹.",
+          "Finite sum: Sₙ = a(rⁿ − 1)/(r − 1) for r ≠ 1. Infinite sum (|r| < 1): S∞ = a/(1 − r).",
+          "If |r| ≥ 1 the infinite sum diverges (grows forever).",
+        ],
+        examples: [
+          { q: "GP: 2, 6, 18, … Find the 5th term.", s: ["a = 2, r = 3.", "a₅ = 2 × 3⁴ = 162."], a: "162" },
+          { q: "Find 1 + 1/2 + 1/4 + … to infinity.", s: ["a = 1, r = 1/2.", "S∞ = 1/(1 − 1/2) = 2."], a: "2" },
+        ],
+      },
+      {
+        id: "seq-special",
+        title: "Special Sequences",
+        keyPoints: [
+          "Quadratic sequences have constant second difference 2a; nth term is an² + bn + c.",
+          "Triangular numbers: 1, 3, 6, 10… with Tₙ = n(n+1)/2. Fibonacci: add previous two (1, 1, 2, 3, 5…).",
+          "Sigma Σ means 'sum': Σₖ₌₁ⁿ k = n(n+1)/2.",
+        ],
+        examples: [
+          { q: "Find the next Fibonacci number after 1, 1, 2, 3, 5, 8.", s: ["Add last two: 5 + 8.", "= 13."], a: "13" },
+          { q: "Find the 5th triangular number.", s: ["T₅ = 5×6/2.", "= 15."], a: "15" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "calc-int",
+    title: "Integration Calculus",
+    emoji: "∫",
+    color: "#27ae60",
+    blurb: "Antidifferentiation, definite integrals and areas.",
+    lessons: [
+      {
+        id: "int-basics",
+        title: "Indefinite Integrals",
+        keyPoints: [
+          "Integration undoes differentiation. ∫xⁿ dx = xⁿ⁺¹/(n+1) + C for n ≠ −1.",
+          "Constant of integration +C because derivatives kill constants — always include it for indefinite integrals.",
+          "Check by differentiating your answer: d/dx [x³/3 + C] = x².",
+        ],
+        examples: [
+          { q: "Find ∫x² dx.", s: ["Power rule: (2+1) = 3.", "x³/3 + C."], a: "x³/3 + C" },
+          { q: "Find ∫3x dx.", s: ["3 × x²/2 + C.", "= 3x²/2 + C."], a: "3x²/2 + C" },
+        ],
+      },
+      {
+        id: "int-definite",
+        title: "Definite Integrals & Area",
+        keyPoints: [
+          "Definite integral ∫ₐᵇ f(x)dx = F(b) − F(a), where F is any antiderivative. The +C cancels out.",
+          "It gives signed area: area above the x-axis counts +, below counts −.",
+          "Example: ∫₀² x² dx = [x³/3]₀² = 8/3.",
+        ],
+        examples: [
+          { q: "Evaluate ∫₀¹ x dx.", s: ["Antiderivative x²/2.", "1/2 − 0 = 1/2."], a: "1/2" },
+          { q: "Evaluate ∫₀² 3 dx.", s: ["Antiderivative 3x.", "6 − 0 = 6."], a: "6" },
+        ],
+      },
+      {
+        id: "int-apply",
+        title: "Areas & Motion",
+        keyPoints: [
+          "Area between curve and x-axis from a to b: ∫ₐᵇ |f(x)| dx (split where f crosses zero).",
+          "Area between two curves: ∫ₐᵇ (top − bottom) dx.",
+          "Motion: displacement = ∫v dt, velocity = ∫a dt. Given v = 3t², displacement from 0 to 2 is [t³]₀² = 8.",
+        ],
+        examples: [
+          { q: "Find the area under y = x from 0 to 4.", s: ["∫₀⁴ x dx = [x²/2]₀⁴.", "= 16/2 = 8."], a: "8" },
+          { q: "Velocity v = 2t. Find displacement from t = 0 to 3.", s: ["∫₀³ 2t dt = [t²]₀³.", "= 9."], a: "9" },
+        ],
+      },
+    ],
+  },
 ];
 
 export function totalLessons(): number {
