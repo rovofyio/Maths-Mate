@@ -2064,6 +2064,29 @@ html[data-power="saver"] body {
 [data-power="saver"] .bomb-body,
 [data-power="saver"] .tower-field { box-shadow: none !important; }
 
+/* ── In-app update banner (Google Play flexible flow) ── */
+.update-banner {
+  position: fixed;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  left: 12px;
+  right: 12px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #fff;
+  border: 2px solid var(--border-strong);
+  border-bottom-width: 4px;
+  border-radius: 16px;
+  padding: 10px 12px;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.update-banner-text { flex: 1; }
+.update-banner-btn { padding: 8px 14px; font-size: 0.8rem; }
+[data-theme="dark"] .update-banner { background: #221e32; border-color: #3b2e6b; color: #fff; }
+
 /* Respect the OS-level reduced-motion setting even in full-effects mode. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

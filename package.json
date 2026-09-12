@@ -21,6 +21,7 @@
     "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.5.1",
+    "@capawesome/capacitor-app-update": "^8.0.5",
     "@preact/signals": "^2.11.1",
     "preact": "^10.29.8"
   },

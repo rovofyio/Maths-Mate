@@ -6,6 +6,7 @@ import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
 import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
 import { SupportModal } from "./components/SupportModal";
+import { UpdateBanner } from "./components/UpdateBanner";
 import type { Route } from "./types";
 
 // Code-split by tab so low-memory devices only parse/hold the JS for the
@@ -87,6 +88,7 @@ export function App() {
       </footer>
 
       <Toast />
+      <UpdateBanner />
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
     </div>
   );

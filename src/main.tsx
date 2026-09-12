@@ -6,6 +6,7 @@ import { initPerf } from "./lib/perf";
 import { getState } from "./lib/store";
 import { startMusic } from "./lib/music";
 import { initSleepMode } from "./lib/sleep";
+import { initAppUpdates } from "./lib/appUpdate";
 import "./styles.css";
 
 // Apply power-saver before first paint so low-end devices never
@@ -21,6 +22,8 @@ initTheme();
 initPowerMode();
 // Puts the app to sleep on mobile background/lock (stops music, frees memory).
 initSleepMode();
+// Google Play flexible in-app updates: background download on start + resume.
+initAppUpdates();
 
 render(
   <ErrorBoundary>
