@@ -11,6 +11,11 @@ import stoneGolemIdleUrl from "../../Pictures/StoneGolemIdle.png";
 import stoneGolemAttackUrl from "../../Pictures/StoneGolemAttack.png";
 import shadowDemonIdleUrl from "../../Pictures/ShadowDemonIdle.png";
 import shadowDemonAttackUrl from "../../Pictures/ShadowDemonAttack.png";
+import mechamonIdleUrl from "../../Pictures/MechamonIdle.png";
+import mechamonAttackUrl from "../../Pictures/MechamonAttack.png";
+import siwangIdleUrl from "../../Pictures/SiwangIdle.png";
+import siwangAttackUrl from "../../Pictures/Siwangattack.png";
+import siwangSuperUrl from "../../Pictures/SiwangSuper.png";
 
 /* ── helpers ── */
 const ri = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -226,7 +231,7 @@ function makeQsForLevel(levelId: number): PvpQ {
 }
 
 /* ── levels ── */
-interface Enemy { name: string; emoji: string; hp: number; dmg: number; color: string; bg: string; }
+interface Enemy { name: string; emoji: string; hp: number; dmg: number; color: string; bg: string; idle?: string; attack?: string; sheetSplit?: boolean; }
 interface LevelCfg {
   id: number;
   title: string;
@@ -235,6 +240,7 @@ interface LevelCfg {
   topics: string;
   diff: Difficulty;
   enemy: Enemy;
+  stage2?: Enemy;
   blurb: string;
 }
 
@@ -276,7 +282,7 @@ const LEVELS: LevelCfg[] = [
     emoji: "∫",
     topics: "calculus",
     diff: "hard",
-    enemy: { name: "Mecha Overlord", emoji: "🤖", hp: 120, dmg: 10, color: "#2980b9", bg: "#3498db" },
+    enemy: { name: "Mecha Overlord", emoji: "🤖", hp: 120, dmg: 10, color: "#2980b9", bg: "#3498db", idle: mechamonIdleUrl, attack: mechamonAttackUrl },
     blurb: "Differentiate to overload the mech's circuits.",
   },
   {
@@ -286,8 +292,12 @@ const LEVELS: LevelCfg[] = [
     emoji: "🌌",
     topics: "all advanced",
     diff: "hard",
-    enemy: { name: "Void Dragon", emoji: "🐉", hp: 150, dmg: 12, color: "#2c3e50", bg: "#34495e" },
-    blurb: "Only masters survive the dragon's limitless void.",
+    enemy: { name: "Void Dragon", emoji: "🐉", hp: 150, dmg: 12, color: "#2c3e50", bg: "#34495e", idle: siwangIdleUrl, attack: siwangAttackUrl },
+    // Stage 2: after defeating Siwang (stage 1), Supa Siwang emerges.
+    // SiwangSuper.png is a 2-up sheet (idle left / attack right), rendered
+    // as SupaSiwangIdle / SupaSiwangattack via the sheetSplit crop.
+    stage2: { name: "Supa Siwang", emoji: "🐉🔥", hp: 150, dmg: 14, color: "#c0392b", bg: "#e74c3c", idle: siwangSuperUrl, attack: siwangSuperUrl, sheetSplit: true },
+    blurb: "Only masters survive the dragon's limitless void. Two stages: Siwang, then Supa Siwang.",
   },
 ];
 
@@ -338,6 +348,9 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
   const [dmgPopPlayer, setDmgPopPlayer] = useState<number | null>(null);
   const [isAttacking, setIsAttacking] = useState(false);
   const [isEnemyAttacking, setIsEnemyAttacking] = useState(false);
+  // Void Dragon (level 5) is a 2-stage fight: 1 = Siwang, 2 = Supa Siwang.
+  const [stage, setStage] = useState(1);
+  const [stageBanner, setStageBanner] = useState<string | null>(null);
 
   const statsRef = useRef({ correct: 0, total: 0, bestStreak: 0, streak: 0 });
   const roundsRef = useRef(0);
@@ -348,6 +361,8 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
     setSelected(lv);
     setPlayerHP(100);
     setEnemyHP(lv.enemy.hp);
+    setStage(1);
+    setStageBanner(null);
     setRound(1);
     roundsRef.current = 1;
     statsRef.current = { correct: 0, total: 0, bestStreak: 0, streak: 0 };
@@ -442,15 +457,38 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
       setTimeout(() => setIsAttacking(false), 800);
     }
 
+    // active enemy depends on stage (Void Dragon has 2 stages)
+    const activeEnemy = stage === 2 && selected.stage2 ? selected.stage2 : selected.enemy;
+
     // animate player attack
     setDmgPopEnemy(finalPDmg);
     setEnemyShake(finalPDmg > 0);
-    setFlash({ tier, pDmg: finalPDmg, eDmg: selected.enemy.dmg, boat: 0 });
+    setFlash({ tier, pDmg: finalPDmg, eDmg: activeEnemy.dmg, boat: 0 });
     const newEnemyHP = Math.max(0, enemyHP - finalPDmg);
     setEnemyHP(newEnemyHP);
 
-    // victory check before enemy counter
+    // stage / victory check before enemy counter
     if (newEnemyHP <= 0) {
+      // Void Dragon stage 1 defeated -> awaken Supa Siwang (stage 2)
+      if (selected.stage2 && stage === 1) {
+        const s2 = selected.stage2;
+        setTimeout(() => {
+          setDmgPopEnemy(null);
+          setEnemyShake(false);
+          setStage(2);
+          setEnemyHP(s2.hp);
+          setPlayerHP(100); // restore player HP for the final stage
+          setRound(1);
+          roundsRef.current = 1;
+          setStageBanner(`🔥 ${selected.enemy.name} defeated! ${s2.emoji} ${s2.name} awakens — defeat both stages to win!`);
+          setTimeout(() => setStageBanner(null), 3200);
+          setQuestion(makeQsForLevel(selected.id));
+          questionStartTime.current = Date.now();
+          setFlash(null);
+          setLocked(false);
+        }, 900);
+        return;
+      }
       setTimeout(() => {
         setDmgPopEnemy(null);
         setEnemyShake(false);
@@ -467,7 +505,8 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
       // enemy attacks
       setIsEnemyAttacking(true);
       setTimeout(() => setIsEnemyAttacking(false), 800);
-      const eDmg = selected.enemy.dmg + ri(-1, 1); // variance
+      const counterDmg = (stage === 2 && selected.stage2 ? selected.stage2 : selected.enemy).dmg;
+      const eDmg = counterDmg + ri(-1, 1); // variance
       const clamped = Math.max(2, eDmg);
       setDmgPopPlayer(clamped);
       setPlayerShake(true);
@@ -488,7 +527,12 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
         setFlash(null);
         setRound(r => r + 1);
         if (roundsRef.current > 20) {
-          // after 20 rounds compare HP
+          // after 20 rounds compare HP (per stage)
+          if (selected.stage2 && stage === 1) {
+            // stage 1 not beaten in time -> defeat (stage 2 never reached)
+            setPhase("defeat");
+            return;
+          }
           const won = newEnemyHP < newPlayerHP;
           if (won) setPhase("victory"); else setPhase("defeat");
           return;
@@ -569,7 +613,7 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
                   <div className="pvp-lv-blurb">{lv.blurb}</div>
                   <div className="pvp-lv-meta">
                     <span className="pvp-lv-tag" style={{ color: lv.enemy.color, background: `${lv.enemy.color}14`, borderColor: `${lv.enemy.color}33` }}>Lv {lv.id}</span>
-                    <span className="pvp-lv-vs">{lv.enemy.emoji} {lv.enemy.name} · {lv.enemy.hp} HP · {lv.enemy.dmg} DMG</span>
+                    <span className="pvp-lv-vs">{lv.enemy.emoji} {lv.enemy.name} · {lv.enemy.hp} HP · {lv.enemy.dmg} DMG{lv.stage2 ? ` + ${lv.stage2.emoji} ${lv.stage2.name} · 2 stages` : ""}</span>
                   </div>
                 </div>
                 <span className="pvp-lv-go">⚔️ Fight</span>
@@ -594,7 +638,9 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
         <div className="pvp-result">
           <div className="pvp-res-emoji">🏆</div>
           <h2 className="pvp-res-title">Victory!</h2>
-          <p className="muted">You defeated {selected.enemy.emoji} {selected.enemy.name} in {round} rounds!</p>
+          <p className="muted">{selected.stage2
+            ? `You defeated ${selected.enemy.emoji} ${selected.enemy.name} and ${selected.stage2.emoji} ${selected.stage2.name} — both stages cleared!`
+            : `You defeated ${selected.enemy.emoji} ${selected.enemy.name} in ${round} rounds!`}</p>
           <div className="pvp-res-stats">
             <div className="pvp-res-stat"><span className="pvp-rs-num">{s.correct}/{s.total}</span><span className="pvp-rs-lab">hits</span></div>
             <div className="pvp-res-stat"><span className="pvp-rs-num">×{s.bestStreak}</span><span className="pvp-rs-lab">best streak</span></div>
@@ -608,12 +654,13 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
   }
   if (phase === "defeat") {
     const s = statsRef.current;
+    const defeatEnemy = stage === 2 && selected.stage2 ? selected.stage2 : selected.enemy;
     return (
       <GameShell emoji="⚔️" name="Monster PvP" onQuit={() => finish(false)}>
         <div className="pvp-result">
           <div className="pvp-res-emoji">💀</div>
           <h2 className="pvp-res-title">Defeated</h2>
-          <p className="muted">{selected.enemy.emoji} {selected.enemy.name} was too strong. Train and return!</p>
+          <p className="muted">{defeatEnemy.emoji} {defeatEnemy.name} was too strong{selected.stage2 ? ` (Stage ${stage}/2)` : ""}. Train and return!</p>
           <div className="pvp-res-stats">
             <div className="pvp-res-stat"><span className="pvp-rs-num">{s.correct}/{s.total}</span><span className="pvp-rs-lab">hits</span></div>
             <div className="pvp-res-stat"><span className="pvp-rs-num">{enemyHP} HP</span><span className="pvp-rs-lab">enemy left</span></div>
@@ -629,31 +676,58 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
   }
 
   /* ── battle ── */
-  const enemyPct = Math.max(0, (enemyHP / selected.enemy.hp) * 100);
+  const battleEnemy = stage === 2 && selected.stage2 ? selected.stage2 : selected.enemy;
+  const enemyPct = Math.max(0, (enemyHP / battleEnemy.hp) * 100);
   const playerPct = Math.max(0, (playerHP / 100) * 100);
+  const pills = [`${selected.emoji} ${selected.title}`, `Round ${round}`];
+  if (selected.stage2) pills.push(`Stage ${stage}/2`);
+
+  const renderEnemySprite = () => {
+    // Supa Siwang: SiwangSuper.png is a 2-up sheet (SupaSiwangIdle left /
+    // SupaSiwangattack right) — crop to halves via the supa frame.
+    if (battleEnemy.sheetSplit && battleEnemy.idle) {
+      return (
+        <div className={`pvp-supa-frame${isEnemyAttacking ? " pvp-sprite-attack" : ""}`}>
+          <img
+            src={battleEnemy.idle}
+            className={isEnemyAttacking ? "show-right" : "show-left"}
+            alt={battleEnemy.name}
+            draggable={false}
+          />
+        </div>
+      );
+    }
+    if (battleEnemy.idle && battleEnemy.attack) {
+      return (
+        <img src={isEnemyAttacking ? battleEnemy.attack : battleEnemy.idle} className={`pvp-sprite-emoji${isEnemyAttacking ? " pvp-sprite-attack" : ""}`} alt={battleEnemy.name} draggable={false} />
+      );
+    }
+    return null;
+  };
 
   return (
-    <GameShell emoji="⚔️" name="Monster PvP" pills={[`${selected.emoji} ${selected.title}`, `Round ${round}`]} onQuit={() => finish(false)}>
+    <GameShell emoji="⚔️" name="Monster PvP" pills={pills} onQuit={() => finish(false)}>
       <div className="pvp-arena">
+        {stageBanner && <div className="pvp-flash perfect" role="status">{stageBanner}</div>}
         {/* Enemy */}
         <div className={`pvp-combatant enemy ${enemyShake ? "shake" : ""}`}>
           <div className="pvp-combatant-head">
-            <span className="pvp-combatant-name">{selected.enemy.emoji} {selected.enemy.name}</span>
+            <span className="pvp-combatant-name">{battleEnemy.emoji} {battleEnemy.name}{selected.stage2 ? ` — Stage ${stage}/2` : ""}</span>
             <span className="pvp-lv-badge">Lv {selected.id}</span>
           </div>
           <div className="pvp-hp-row">
             <span className="pvp-hp-label">HP</span>
             <div className="pvp-hp-bar"><div className="pvp-hp-fill enemy" style={{ width: `${enemyPct}%` }} /></div>
-            <span className="pvp-hp-num">{enemyHP}/{selected.enemy.hp}</span>
+            <span className="pvp-hp-num">{enemyHP}/{battleEnemy.hp}</span>
           </div>
           <div className="pvp-sprite enemy">
-            {selected.enemy.name === "Stone Golem" ? (
+            {renderEnemySprite() ?? (selected.enemy.name === "Stone Golem" ? (
               <img src={isEnemyAttacking ? stoneGolemAttackUrl : stoneGolemIdleUrl} className={`pvp-sprite-emoji${isEnemyAttacking ? " pvp-sprite-attack" : ""}`} alt={selected.enemy.name} draggable={false} />
             ) : selected.enemy.name === "Shadow Demon" ? (
               <img src={isEnemyAttacking ? shadowDemonAttackUrl : shadowDemonIdleUrl} className={`pvp-sprite-emoji${isEnemyAttacking ? " pvp-sprite-attack" : ""}`} alt={selected.enemy.name} draggable={false} />
             ) : (
               <img src={slimeUrl} className="pvp-sprite-emoji" alt={selected.enemy.name} draggable={false} />
-            )}
+            ))}
             {dmgPopEnemy !== null && <span className={`pvp-dmg-pop ${dmgPopEnemy === 5 ? "perfect" : dmgPopEnemy===2 ? "close" : "miss"}`}>-{dmgPopEnemy}</span>}
             {flash && flash.pDmg === 5 && <span className="pvp-crit">CRITICAL!</span>}
           </div>
