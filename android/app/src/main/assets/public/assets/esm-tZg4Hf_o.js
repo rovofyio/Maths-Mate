@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-BzGBlrMy.js","assets/index-By6iEQI8.js","assets/vendor-B10nirLk.js","assets/index-AyHx0lpf.css"])))=>i.map(i=>d[i]);
+import{c as e,v as t}from"./index-By6iEQI8.js";var n;(function(e){e[e.Flush=0]=`Flush`,e[e.Add=1]=`Add`})(n||={});var r=t(`TextToSpeech`,{web:()=>e(()=>import(`./web-BzGBlrMy.js`).then(e=>new e.TextToSpeechWeb),__vite__mapDeps([0,1,2,3]))});`speechSynthesis`in window&&window.speechSynthesis;export{n as QueueStrategy,r as TextToSpeech};
