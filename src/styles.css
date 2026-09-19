@@ -1591,12 +1591,6 @@ footer {
 .pvp-hp-num { font-size: 0.78rem; font-weight: 900; color: var(--muted); min-width: 52px; text-align: right; }
 .pvp-sprite { position: relative; height: 210px; display: grid; place-items: center; overflow: visible; }
 .pvp-sprite-emoji { width: 10rem; height: 10rem; object-fit: contain; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.12)); animation: pvp-breathe 1s ease-in-out infinite; }
-/* Supa Siwang 2-up sheet (SupaSiwangIdle left / SupaSiwangattack right): crop halves via margin so the breathe/attack transforms stay on the frame. */
-.pvp-supa-frame { width: 10rem; height: 10rem; overflow: hidden; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.12)); animation: pvp-breathe 1s ease-in-out infinite; }
-.pvp-supa-frame.pvp-sprite-attack { animation: pvp-attack 0.8s ease-out forwards; }
-.pvp-supa-frame img { width: 20rem; height: 10rem; max-width: none; object-fit: contain; display: block; }
-.pvp-supa-frame img.show-left { margin-left: 0; }
-.pvp-supa-frame img.show-right { margin-left: -10rem; }
 .pvp-dmg-pop { position: absolute; top: 14px; right: 16px; font-weight: 900; font-size: 1.35rem; padding: 4px 10px; border-radius: 999px; border: 2px solid; border-bottom-width: 3px; animation: pvp-pop 0.7s ease forwards; }
 .pvp-dmg-pop.perfect { background: var(--primary); color: #fff; border-color: var(--primary-dark); }
 .pvp-dmg-pop.close { background: #f39c12; color: #fff; border-color: #e67e22; }
@@ -2108,3 +2102,34 @@ html[data-power="saver"] body {
   .pvp-sprite-emoji { animation: none !important; }
   .pause-overlay, .modal-overlay, .result-overlay { backdrop-filter: none !important; }
 }
+
+/* ── Cookie consent (first-run only) + Privacy Policy ── */
+.cookie-overlay { z-index: 80; }
+.cookie-modal {
+  background: #fff; border-radius: var(--radius); padding: 22px; width: 100%; max-width: 420px;
+  border: 2px solid var(--border); border-bottom-width: 4px; position: relative;
+  display: flex; flex-direction: column; gap: 12px; text-align: center;
+}
+.cookie-emoji { font-size: 2.2rem; }
+.cookie-modal h2 { font-weight: 900; letter-spacing: -0.01em; }
+.cookie-text { font-size: 0.9rem; line-height: 1.45; font-weight: 600; color: var(--text); }
+.cookie-actions { display: flex; gap: 10px; }
+.cookie-actions .btn-primary, .cookie-actions .btn-ghost { flex: 1; text-align: center; }
+.cookie-note { text-align: center; }
+.privacy-modal {
+  background: #fff; border-radius: var(--radius); padding: 20px; width: 100%; max-width: 560px;
+  border: 2px solid var(--border); border-bottom-width: 4px; position: relative;
+  display: flex; flex-direction: column; gap: 12px; max-height: min(84dvh, 720px);
+}
+.privacy-modal h2 { font-weight: 900; letter-spacing: -0.01em; padding-right: 36px; }
+.privacy-body {
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 14px; padding-right: 4px;
+  user-select: text; -webkit-user-select: text;
+}
+.privacy-section { display: flex; flex-direction: column; gap: 8px; }
+.privacy-h { font-size: 1rem; font-weight: 900; }
+.privacy-p { font-size: 0.88rem; line-height: 1.5; font-weight: 600; white-space: pre-line; }
+.privacy-list { display: flex; flex-direction: column; gap: 6px; }
+[data-theme="dark"] .cookie-modal, [data-theme="dark"] .privacy-modal { background: #221e32; border-color: #2f2850; color: #fff; }
+[data-theme="dark"] .cookie-text, [data-theme="dark"] .privacy-p, [data-theme="dark"] .privacy-h { color: #fff; }

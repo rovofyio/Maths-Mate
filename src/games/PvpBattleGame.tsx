@@ -15,7 +15,8 @@ import mechamonIdleUrl from "../../Pictures/MechamonIdle.png";
 import mechamonAttackUrl from "../../Pictures/MechamonAttack.png";
 import siwangIdleUrl from "../../Pictures/SiwangIdle.png";
 import siwangAttackUrl from "../../Pictures/Siwangattack.png";
-import siwangSuperUrl from "../../Pictures/SiwangSuper.png";
+import supaSiwangIdleUrl from "../../Pictures/SupaSiwangIdle.png";
+import supaSiwangAttackUrl from "../../Pictures/SupaSiwangAttack.png";
 
 /* ── helpers ── */
 const ri = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -231,7 +232,7 @@ function makeQsForLevel(levelId: number): PvpQ {
 }
 
 /* ── levels ── */
-interface Enemy { name: string; emoji: string; hp: number; dmg: number; color: string; bg: string; idle?: string; attack?: string; sheetSplit?: boolean; }
+interface Enemy { name: string; emoji: string; hp: number; dmg: number; color: string; bg: string; idle?: string; attack?: string; }
 interface LevelCfg {
   id: number;
   title: string;
@@ -294,9 +295,7 @@ const LEVELS: LevelCfg[] = [
     diff: "hard",
     enemy: { name: "Void Dragon", emoji: "🐉", hp: 150, dmg: 12, color: "#2c3e50", bg: "#34495e", idle: siwangIdleUrl, attack: siwangAttackUrl },
     // Stage 2: after defeating Siwang (stage 1), Supa Siwang emerges.
-    // SiwangSuper.png is a 2-up sheet (idle left / attack right), rendered
-    // as SupaSiwangIdle / SupaSiwangattack via the sheetSplit crop.
-    stage2: { name: "Supa Siwang", emoji: "🐉🔥", hp: 150, dmg: 14, color: "#c0392b", bg: "#e74c3c", idle: siwangSuperUrl, attack: siwangSuperUrl, sheetSplit: true },
+    stage2: { name: "Supa Siwang", emoji: "🐉🔥", hp: 150, dmg: 14, color: "#c0392b", bg: "#e74c3c", idle: supaSiwangIdleUrl, attack: supaSiwangAttackUrl },
     blurb: "Only masters survive the dragon's limitless void. Two stages: Siwang, then Supa Siwang.",
   },
 ];
@@ -683,20 +682,6 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
   if (selected.stage2) pills.push(`Stage ${stage}/2`);
 
   const renderEnemySprite = () => {
-    // Supa Siwang: SiwangSuper.png is a 2-up sheet (SupaSiwangIdle left /
-    // SupaSiwangattack right) — crop to halves via the supa frame.
-    if (battleEnemy.sheetSplit && battleEnemy.idle) {
-      return (
-        <div className={`pvp-supa-frame${isEnemyAttacking ? " pvp-sprite-attack" : ""}`}>
-          <img
-            src={battleEnemy.idle}
-            className={isEnemyAttacking ? "show-right" : "show-left"}
-            alt={battleEnemy.name}
-            draggable={false}
-          />
-        </div>
-      );
-    }
     if (battleEnemy.idle && battleEnemy.attack) {
       return (
         <img src={isEnemyAttacking ? battleEnemy.attack : battleEnemy.idle} className={`pvp-sprite-emoji${isEnemyAttacking ? " pvp-sprite-attack" : ""}`} alt={battleEnemy.name} draggable={false} />

@@ -7,6 +7,7 @@ import { getState } from "./lib/store";
 import { startMusic } from "./lib/music";
 import { initSleepMode } from "./lib/sleep";
 import { initAppUpdates } from "./lib/appUpdate";
+import { initPurchases } from "./lib/iap";
 import "./styles.css";
 
 // Apply power-saver before first paint so low-end devices never
@@ -24,6 +25,8 @@ initPowerMode();
 initSleepMode();
 // Google Play flexible in-app updates: background download on start + resume.
 initAppUpdates();
+// RevenueCat IAP (Play Billing / StoreKit 2). No-op on web or without keys.
+void initPurchases();
 
 render(
   <ErrorBoundary>

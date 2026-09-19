@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.mathaura.app",
+  appId: "io.rovofy.mathsaura",
   appName: "Math Aura",
   webDir: "dist",
   // Use https scheme for Android (required for Play Store) and allow mixed content for audio/assets

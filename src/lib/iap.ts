@@ -69,34 +69,126 @@ export interface PurchaseOutcome {
   product: Product;
 }
 
+function readEnv(name: string): string {
+  try {
+    const env = (import.meta as unknown as { env?: Record<string, string | undefined> }).env;
+    return env?.[name] ?? "";
+  } catch {
+    return "";
+  }
+}
+
+// RevenueCat API keys (per platform). Set VITE_REVENUECAT_* at build time.
+// Until keys + products exist in Play Console / App Store Connect / RevenueCat
+// dashboard, native purchases fall back to the simulated flow so CI stays green.
+const RC_ANDROID_KEY = readEnv("VITE_REVENUECAT_ANDROID_KEY");
+const RC_IOS_KEY = readEnv("VITE_REVENUECAT_IOS_KEY");
+
+let rcConfigured = false;
+let rcConfigureAttempted = false;
+
+type RcPurchases = {
+  configure: (o: { apiKey: string }) => Promise<void>;
+  getProducts: (o: { productIdentifiers: string[] }) => Promise<{ products: Array<{ identifier: string }> }>;
+  purchaseStoreProduct: (o: { product: unknown }) => Promise<unknown>;
+  restorePurchases: () => Promise<{ customerInfo?: { entitlements?: { active?: Record<string, unknown> } } }>;
+  getCustomerInfo: () => Promise<{ customerInfo?: { entitlements?: { active?: Record<string, unknown> } } }>;
+};
+
+async function getRc(): Promise<RcPurchases | null> {
+  if (!Capacitor.isNativePlatform()) return null;
+  try {
+    const mod = await import("@revenuecat/purchases-capacitor");
+    return mod.Purchases as unknown as RcPurchases;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Native IAP goes through a Capacitor plugin (e.g. RevenueCat Purchases or a
- * store-specific IAP plugin) exposed on the Capacitor plugin registry. On web
- * and during development the flow is simulated so the whole economy is
- * testable; wire real store IDs in the native app.
+ * Call once at boot (see src/main.tsx). Configures RevenueCat when a native
+ * platform + API key is present. Uses Play Billing Library (via RevenueCat
+ * Android SDK, Billing v9 → compliant past the 31 Aug 2026 v8 deadline) and
+ * StoreKit 2 on iOS. Safe no-op on web / without keys.
+ */
+export async function initPurchases(): Promise<void> {
+  if (rcConfigureAttempted || !Capacitor.isNativePlatform()) return;
+  rcConfigureAttempted = true;
+  try {
+    const platform = Capacitor.getPlatform();
+    const apiKey = platform === "ios" ? RC_IOS_KEY : RC_ANDROID_KEY;
+    if (!apiKey) {
+      console.warn("RevenueCat API key not set — IAP runs in simulated mode.");
+      return;
+    }
+    const rc = await getRc();
+    if (!rc) return;
+    await rc.configure({ apiKey });
+    rcConfigured = true;
+    await syncEntitlementsFromStore();
+  } catch (err) {
+    console.warn("RevenueCat configure failed — IAP runs in simulated mode.", err);
+  }
+}
+
+async function syncEntitlementsFromStore(): Promise<void> {
+  if (!rcConfigured) return;
+  try {
+    const rc = await getRc();
+    if (!rc) return;
+    const { customerInfo } = await rc.getCustomerInfo();
+    applyEntitlements(customerInfo?.entitlements?.active);
+  } catch {
+    /* offline / not entitled — keep local state */
+  }
+}
+
+function applyEntitlements(active?: Record<string, unknown>): void {
+  if (!active) return;
+  // Map RevenueCat entitlement ids straight onto local product ids.
+  // Configure matching entitlement identifiers in the RevenueCat dashboard.
+  for (const id of ["premium", "remove_ads", "unlock_games"] as ProductId[]) {
+    if (active[id]) setPurchase(id);
+  }
+  if (active["premium"]) {
+    setPurchase("premium");
+    setPurchase("remove_ads");
+    setPurchase("unlock_games");
+  }
+}
+
+/**
+ * Native IAP goes through RevenueCat (StoreKit 2 on iOS, Play Billing on
+ * Android). On web and during development — or when no RevenueCat key is
+ * configured — the flow is simulated so the whole economy is testable.
  */
 export async function purchaseProduct(id: ProductId): Promise<PurchaseOutcome> {
   const product = PRODUCTS.find((p) => p.id === id);
   if (!product) throw new Error(`Unknown product ${id}`);
 
-  const native = Capacitor.isNativePlatform();
-  if (native) {
+  if (Capacitor.isNativePlatform() && rcConfigured) {
     try {
-      const plugins = (window as unknown as { Capacitor?: { Plugins?: Record<string, unknown> } }).Capacitor?.Plugins;
-      const store = plugins?.["Purchases"] ?? plugins?.["InAppPurchase"];
-      if (!store) {
-        console.warn("No native IAP plugin registered — falling back to simulated purchase.");
-      } else {
-        await (store as { purchase: (o: unknown) => Promise<unknown> }).purchase({ productId: id });
-        grantProduct(id);
-        return { ok: true, product };
-      }
+      const rc = await getRc();
+      if (!rc) throw new Error("RevenueCat unavailable");
+      const { products } = await rc.getProducts({ productIdentifiers: [id] });
+      const storeProduct = products?.[0];
+      if (!storeProduct) throw new Error(`Product ${id} not found in store`);
+      const result = (await rc.purchaseStoreProduct({ product: storeProduct })) as {
+        customerInfo?: { entitlements?: { active?: Record<string, unknown> } };
+      };
+      applyEntitlements(result?.customerInfo?.entitlements?.active);
+      grantProduct(id);
+      return { ok: true, product };
     } catch (err) {
-      console.error("Native purchase failed", err);
+      const cancelled = err instanceof Error && /cancel/i.test(err.message);
+      if (!cancelled) console.error("Native purchase failed", err);
       return { ok: false, product };
     }
   }
 
+  if (Capacitor.isNativePlatform()) {
+    console.warn("No native IAP configured — falling back to simulated purchase.");
+  }
   grantProduct(id);
   return { ok: true, product };
 }
@@ -111,6 +203,18 @@ export function grantProduct(id: ProductId): void {
   }
 }
 
-export function restorePurchases(): void {
+export async function restorePurchases(): Promise<void> {
+  if (Capacitor.isNativePlatform() && rcConfigured) {
+    try {
+      const rc = await getRc();
+      if (!rc) return;
+      const { customerInfo } = await rc.restorePurchases();
+      applyEntitlements(customerInfo?.entitlements?.active);
+      return;
+    } catch (err) {
+      console.error("Restore purchases failed", err);
+      return;
+    }
+  }
   // With a native plugin this would query the store; on web/dev nothing to do.
 }

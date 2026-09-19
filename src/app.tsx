@@ -6,7 +6,9 @@ import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
 import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
 import { SupportModal } from "./components/SupportModal";
+import { CookieConsent } from "./components/CookieConsent";
 import { UpdateBanner } from "./components/UpdateBanner";
+import { hasConsented } from "./lib/consent";
 import type { Route } from "./types";
 
 // Code-split by tab so low-memory devices only parse/hold the JS for the
@@ -34,6 +36,8 @@ export function App() {
   const route = activeRoute.value;
   const s = state.value;
   const [showSupport, setShowSupport] = useState(false);
+  // First-run only: show the cookie popup once, never again automatically.
+  const [showCookie, setShowCookie] = useState(() => !hasConsented());
 
   const nav = [
     { name: "games" as const, label: "Games", icon: "🎮" },
@@ -90,6 +94,7 @@ export function App() {
       <Toast />
       <UpdateBanner />
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
+      {showCookie && <CookieConsent onDone={() => setShowCookie(false)} />}
     </div>
   );
 }

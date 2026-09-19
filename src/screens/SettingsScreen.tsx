@@ -4,6 +4,8 @@ import { showToast } from "../lib/toast";
 import { setTheme, setPowerMode } from "../lib/settings";
 import { startMusic, stopMusic } from "../lib/music";
 import { getDeviceCaps, isPowerSaverActive } from "../lib/perf";
+import { getConsent, setConsent } from "../lib/consent";
+import { PrivacyPolicyModal } from "../components/PrivacyPolicyModal";
 import {
   connectFacebook,
   connectGoogle,
@@ -21,6 +23,8 @@ export function SettingsScreen() {
   const saverOn = isPowerSaverActive();
   const [busy, setBusy] = useState<null | "google" | "facebook">(null);
   const [showIds, setShowIds] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [consent, setConsentState] = useState(() => getConsent());
   const [googleClientId, setGoogleClientId] = useState(() => getSocialIds().googleClientId);
   const [facebookAppId, setFacebookAppId] = useState(() => getSocialIds().facebookAppId);
 
@@ -255,6 +259,51 @@ export function SettingsScreen() {
             <span className="toggle-knob" />
           </button>
         </div>
+
+        <h2 className="section-title no-margin">🔒 Privacy &amp; Legal</h2>
+        <div className="setting-row">
+          <div className="setting-info">
+            <span className="setting-icon">📄</span>
+            <div>
+              <div className="setting-name">Privacy Policy</div>
+              <div className="setting-desc">Rovofy.io · Effective Sept 19th, 2026</div>
+            </div>
+          </div>
+          <button className="btn-buy" onClick={() => setShowPrivacy(true)}>
+            View
+          </button>
+        </div>
+        <div className="setting-row">
+          <div className="setting-info">
+            <span className="setting-icon">🍪</span>
+            <div>
+              <div className="setting-name">Cookie consent</div>
+              <div className="setting-desc">
+                {consent ? `Your choice: ${consent.choice === "accepted" ? "Accepted" : "Rejected"}` : "Not set"}
+              </div>
+            </div>
+          </div>
+          <div className="segmented">
+            <button
+              className={`segment ${consent?.choice === "accepted" ? "active" : ""}`}
+              onClick={() => {
+                setConsentState(setConsent("accepted"));
+                showToast("Cookie consent: accepted");
+              }}
+            >
+              Accept
+            </button>
+            <button
+              className={`segment ${consent?.choice === "rejected" ? "active" : ""}`}
+              onClick={() => {
+                setConsentState(setConsent("rejected"));
+                showToast("Cookie consent: rejected");
+              }}
+            >
+              Reject
+            </button>
+          </div>
+        </div>
       </div>
 
       <button
@@ -269,6 +318,7 @@ export function SettingsScreen() {
         Reset all progress
       </button>
       <p className="muted small">Progress is stored locally on this device.</p>
+      {showPrivacy && <PrivacyPolicyModal onClose={() => setShowPrivacy(false)} />}
     </div>
   );
 }
