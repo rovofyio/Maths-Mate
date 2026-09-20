@@ -1525,23 +1525,6 @@ footer {
 }
 
 /* ── Monster PvP — Pokémon-style ── */
-.pvp-agegate {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  max-width: 420px;
-  margin: 16px auto;
-  padding: 24px;
-  background: #fff;
-  border: 2px solid var(--border);
-  border-bottom-width: 4px;
-  border-radius: var(--radius);
-  text-align: center;
-}
-.pvp-age-emoji { font-size: 2.6rem; width: 72px; height: 72px; display: grid; place-items: center; background: var(--primary-light); border: 2px solid var(--border-strong); border-bottom-width: 4px; border-radius: 20px; }
-.pvp-agegate h2 { font-weight: 900; letter-spacing: -0.02em; }
-.pvp-age-row { display: flex; gap: 8px; width: 100%; }
 .pvp-age-input {
   flex: 1; background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 12px;
   padding: 10px 12px; font-size: 1rem; font-weight: 800; text-align: center; color: var(--text);
@@ -2103,8 +2086,49 @@ html[data-power="saver"] body {
   .pause-overlay, .modal-overlay, .result-overlay { backdrop-filter: none !important; }
 }
 
+/* ── Boot splash (Unity-style, every launch, ≤1.5s total) ── */
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  animation: splashOut 0.3s ease 1.2s forwards;
+}
+.splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  animation: splashFadeIn 0.9s ease both;
+}
+.splash-text {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.splash-logo {
+  display: block;
+  width: min(220px, 60vw);
+  height: auto;
+  object-fit: contain;
+}
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes splashOut {
+  to { opacity: 0; visibility: hidden; }
+}
+[data-theme="dark"] .splash-overlay { background: #171325; }
+[data-theme="dark"] .splash-text { color: #cfc6ea; }
+
 /* ── Cookie consent (first-run only) + Privacy Policy ── */
 .cookie-overlay { z-index: 80; }
+.age-overlay { z-index: 90; }
 .cookie-modal {
   background: #fff; border-radius: var(--radius); padding: 22px; width: 100%; max-width: 420px;
   border: 2px solid var(--border); border-bottom-width: 4px; position: relative;

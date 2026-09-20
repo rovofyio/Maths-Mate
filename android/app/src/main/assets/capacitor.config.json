@@ -1,5 +1,5 @@
 {
-	"appId": "com.mathaura.app",
+	"appId": "io.rovofy.mathsaura",
 	"appName": "Math Aura",
 	"webDir": "dist",
 	"server": {

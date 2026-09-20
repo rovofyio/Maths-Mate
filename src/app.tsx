@@ -1,14 +1,17 @@
 import { signal } from "@preact/signals";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { lazy, Suspense } from "preact/compat";
 import { state } from "./lib/store";
 import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
 import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
 import { SupportModal } from "./components/SupportModal";
+import { SplashScreen } from "./components/SplashScreen";
 import { CookieConsent } from "./components/CookieConsent";
+import { AgeVerification } from "./components/AgeVerification";
 import { UpdateBanner } from "./components/UpdateBanner";
 import { hasConsented } from "./lib/consent";
+import { hasVerifiedAge } from "./lib/ageVerification";
 import type { Route } from "./types";
 
 // Code-split by tab so low-memory devices only parse/hold the JS for the
@@ -32,10 +35,23 @@ function Toast() {
   );
 }
 
+// Unity-style boot splash duration (ms). Keep in sync with the splash
+// keyframes in styles.css — total sequence must stay at most 1.5s.
+const SPLASH_MS = 1500;
+
 export function App() {
   const route = activeRoute.value;
   const s = state.value;
   const [showSupport, setShowSupport] = useState(false);
+  // Boot splash on every launch (not first-run only).
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowSplash(false), SPLASH_MS);
+    return () => clearTimeout(t);
+  }, []);
+  // First-run only: age check shows once and never again automatically.
+  const [showAgeGate, setShowAgeGate] = useState(() => !hasVerifiedAge());
   // First-run only: show the cookie popup once, never again automatically.
   const [showCookie, setShowCookie] = useState(() => !hasConsented());
 
@@ -94,7 +110,10 @@ export function App() {
       <Toast />
       <UpdateBanner />
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
-      {showCookie && <CookieConsent onDone={() => setShowCookie(false)} />}
+      {/* Boot splash first, then first-run modals (age gate above cookie). */}
+      {showSplash && <SplashScreen />}
+      {!showSplash && showAgeGate && <AgeVerification onDone={() => setShowAgeGate(false)} />}
+      {!showSplash && !showAgeGate && showCookie && <CookieConsent onDone={() => setShowCookie(false)} />}
     </div>
   );
 }
