@@ -4,9 +4,8 @@
     <string name="title_activity_main">Math Aura</string>
     <string name="package_name">io.rovofy.mathsaura</string>
     <string name="custom_url_scheme">io.rovofy.mathsaura</string>
-    <!-- AdMob Application ID. Replace with your real ID from the AdMob console
-         before releasing (format: ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX).
-         The placeholder keeps debug builds from crashing with
-         "Missing APPLICATION_ID" while showing no real ads. -->
-    <string name="admob_app_id">ca-app-pub-0000000000000000~0000000000000000</string>
+<    <!-- AdMob Application ID (Google test ID for debug builds — safe, never crashes).
+         For release, replace with your real ID from admob.com
+         (format: ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX). -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>

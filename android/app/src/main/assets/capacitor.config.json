@@ -14,16 +14,8 @@
 		"backgroundColor": "#fdf7ff"
 	},
 	"plugins": {
-		"SplashScreen": {
-			"launchShowDuration": 1500,
-			"backgroundColor": "#7b1fa2"
-		},
-		"StatusBar": {
-			"style": "light",
-			"backgroundColor": "#7b1fa2"
-		},
 		"AdMob": {
-			"appId": "ca-app-pub-0000000000000000~0000000000000000"
+			"appId": "ca-app-pub-3940256099942544~3347511713"
 		}
 	}
 }

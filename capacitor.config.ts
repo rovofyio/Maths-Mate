@@ -17,16 +17,13 @@ const config: CapacitorConfig = {
     backgroundColor: "#fdf7ff",
   },
   plugins: {
-    SplashScreen: {
-      launchShowDuration: 1500,
-      backgroundColor: "#7b1fa2",
-    },
-    StatusBar: {
-      style: "light",
-      backgroundColor: "#7b1fa2",
-    },
+    // NOTE: SplashScreen/StatusBar keys removed — those @capacitor plugins are
+    // not installed, and stale keys only add confusion on native startup.
+    // Native splash is handled by androidx.core splashscreen + styles.xml.
     AdMob: {
-      appId: process.env.ADMOB_APP_ID || "ca-app-pub-0000000000000000~0000000000000000",
+      // Google test App ID (safe for debug, never crashes GMS).
+      // Override at build time with ADMOB_APP_ID env var for release.
+      appId: process.env.ADMOB_APP_ID || "ca-app-pub-3940256099942544~3347511713",
     },
   },
 };

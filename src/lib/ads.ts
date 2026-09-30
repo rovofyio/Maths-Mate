@@ -30,7 +30,9 @@ async function loadNativeAd(): Promise<void> {
       requestTrackingAuthorization: true,
     });
     if (!admob.InterstitialAd) throw new Error("InterstitialAd unavailable in AdMob plugin");
-    const ad = await admob.InterstitialAd.create({ adUnitId: "ca-app-pub-0000000000000000/0000000000000000" });
+    // Google test interstitial unit (safe for debug — shows test ads, never crashes).
+    // Replace with your real ad unit ID for release.
+    const ad = await admob.InterstitialAd.create({ adUnitId: "ca-app-pub-3940256099942544/1033173712" });
     await ad.load();
     interstitialAd = ad;
   } catch (err) {

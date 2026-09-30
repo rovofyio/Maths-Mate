@@ -2,18 +2,18 @@ import { useState } from "preact/hooks";
 import { setAgeVerification } from "../lib/ageVerification";
 
 export function AgeVerification({ onDone }: { onDone: (age: number) => void }) {
-  const [input, setInput] = useState("");
+  const [selected, setSelected] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const confirm = () => {
-    const n = parseInt(input, 10);
+    const n = parseInt(selected, 10);
     if (!Number.isInteger(n) || n < 1 || n > 99) {
-      setError("Please enter a valid age (1–99).");
+      setError("Please scroll and select your age.");
       return;
     }
     const record = setAgeVerification(n);
     if (!record) {
-      setError("Please enter a valid age (1–99).");
+      setError("Please scroll and select your age.");
       return;
     }
     setError(null);
@@ -30,20 +30,24 @@ export function AgeVerification({ onDone }: { onDone: (age: number) => void }) {
         <p className="cookie-text">
           Maths Aura needs your age once to show the right games for you.
         </p>
-        <input
+        <select
           className="pvp-age-input"
-          type="number"
-          min={1}
-          max={99}
-          inputMode="numeric"
-          placeholder="Enter your age"
           aria-label="Your age"
-          value={input}
-          onInput={(e) => setInput((e.target as HTMLInputElement).value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") confirm();
+          value={selected}
+          onChange={(e) => {
+            setSelected((e.target as HTMLSelectElement).value);
+            setError(null);
           }}
-        />
+        >
+          <option value="" disabled>
+            Select your age
+          </option>
+          {Array.from({ length: 99 }, (_, i) => i + 1).map((age) => (
+            <option key={age} value={age}>
+              {age}
+            </option>
+          ))}
+        </select>
         {error && (
           <p className="muted small" role="alert" style={{ color: "var(--danger, #e74c3c)" }}>
             {error}

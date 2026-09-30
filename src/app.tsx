@@ -1,9 +1,10 @@
 import { signal } from "@preact/signals";
 import { useEffect, useState } from "preact/hooks";
 import { lazy, Suspense } from "preact/compat";
-import { state } from "./lib/store";
+import { state, updateSettings } from "./lib/store";
 import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
+import { startMusic, stopMusic } from "./lib/music";
 import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
 import { SupportModal } from "./components/SupportModal";
 import { SplashScreen } from "./components/SplashScreen";
@@ -59,8 +60,8 @@ export function App() {
     { name: "games" as const, label: "Games", icon: "🎮" },
     { name: "learn" as const, label: "Learn", icon: "📚" },
     { name: "daily" as const, label: "Daily", icon: "🎡" },
-    { name: "profile" as const, label: "Profile", icon: "👤" },
     { name: "shop" as const, label: "Shop", icon: "💎" },
+    { name: "profile" as const, label: "Profile", icon: "👤" },
     { name: "settings" as const, label: "Settings", icon: "⚙️" },
   ];
 
@@ -72,7 +73,23 @@ export function App() {
             <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo" draggable={false} />
           </div>
 <div className="topbar-stats">
-               <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
+                <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
+                <button
+                  type="button"
+                  className="stat-chip"
+                  title={s.settings.music ? "Mute volume" : "Unmute volume"}
+                  aria-label={s.settings.music ? "Mute volume" : "Unmute volume"}
+                  aria-pressed={!s.settings.music}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    const next = !s.settings.music;
+                    updateSettings({ music: next, sound: next });
+                    if (next) startMusic();
+                    else stopMusic();
+                  }}
+                >
+                  {s.settings.music ? "🔊" : "🔇"}
+                </button>
                <div className="stat-chip" title="Coins">
                  🪙 {s.coins}
                </div>

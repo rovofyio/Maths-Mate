@@ -287,17 +287,22 @@ export function SettingsScreen() {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <input
+            <select
               className="pvp-age-input"
-              style={{ width: 90, flex: "none" }}
-              type="number"
-              min={1}
-              max={99}
-              placeholder="Age"
+              style={{ width: 130, flex: "none" }}
               aria-label="Your age"
               value={ageInput}
-              onInput={(e) => setAgeInput((e.target as HTMLInputElement).value)}
-            />
+              onChange={(e) => setAgeInput((e.target as HTMLSelectElement).value)}
+            >
+              <option value="" disabled>
+                Age
+              </option>
+              {Array.from({ length: 99 }, (_, i) => i + 1).map((age) => (
+                <option key={age} value={age}>
+                  {age}
+                </option>
+              ))}
+            </select>
             <button
               className="btn-buy"
               onClick={() => {
