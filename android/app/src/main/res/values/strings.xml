@@ -2,6 +2,10 @@
 <resources>
     <string name="app_name">Math Aura</string>
     <string name="title_activity_main">Math Aura</string>
-    <string name="package_name">com.mathaura.app</string>
-    <string name="custom_url_scheme">com.mathaura.app</string>
+    <string name="package_name">io.rovofy.mathsaura</string>
+    <string name="custom_url_scheme">io.rovofy.mathsaura</string>
+    <!-- AdMob Application ID (Google test ID for debug builds — safe, never crashes).
+         For release, replace with your real ID from admob.com
+         (format: ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX). -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>

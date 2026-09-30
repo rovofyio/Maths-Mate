@@ -65,6 +65,14 @@ window.addEventListener("keydown", resumeMusic);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+    // Never register the web service worker inside the Capacitor native
+    // WebView: it caches stale bundles (white screen after update) and the
+    // absolute "/sw.js" URL does not resolve on https://localhost.
+    import("@capacitor/core")
+      .then(({ Capacitor }) => {
+        if (Capacitor.isNativePlatform()) return;
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      })
+      .catch(() => {});
   });
 }

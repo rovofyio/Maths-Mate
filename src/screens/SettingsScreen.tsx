@@ -5,6 +5,7 @@ import { setTheme, setPowerMode } from "../lib/settings";
 import { startMusic, stopMusic } from "../lib/music";
 import { getDeviceCaps, isPowerSaverActive } from "../lib/perf";
 import { getConsent, setConsent } from "../lib/consent";
+import { getAgeVerification, setAgeVerification } from "../lib/ageVerification";
 import { PrivacyPolicyModal } from "../components/PrivacyPolicyModal";
 import {
   connectFacebook,
@@ -25,6 +26,8 @@ export function SettingsScreen() {
   const [showIds, setShowIds] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [consent, setConsentState] = useState(() => getConsent());
+  const [ageRecord, setAgeRecord] = useState(() => getAgeVerification());
+  const [ageInput, setAgeInput] = useState(() => String(getAgeVerification()?.age ?? ""));
   const [googleClientId, setGoogleClientId] = useState(() => getSocialIds().googleClientId);
   const [facebookAppId, setFacebookAppId] = useState(() => getSocialIds().facebookAppId);
 
@@ -272,6 +275,50 @@ export function SettingsScreen() {
           <button className="btn-buy" onClick={() => setShowPrivacy(true)}>
             View
           </button>
+        </div>
+        <div className="setting-row">
+          <div className="setting-info">
+            <span className="setting-icon">🎂</span>
+            <div>
+              <div className="setting-name">Age verification</div>
+              <div className="setting-desc">
+                {ageRecord ? `Verified age: ${ageRecord.age}` : "Not set"}
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <select
+              className="pvp-age-input"
+              style={{ width: 130, flex: "none" }}
+              aria-label="Your age"
+              value={ageInput}
+              onChange={(e) => setAgeInput((e.target as HTMLSelectElement).value)}
+            >
+              <option value="" disabled>
+                Age
+              </option>
+              {Array.from({ length: 99 }, (_, i) => i + 1).map((age) => (
+                <option key={age} value={age}>
+                  {age}
+                </option>
+              ))}
+            </select>
+            <button
+              className="btn-buy"
+              onClick={() => {
+                const record = setAgeVerification(parseInt(ageInput, 10));
+                if (!record) {
+                  showToast("Enter a valid age (1–99)");
+                  return;
+                }
+                setAgeRecord(record);
+                setAgeInput(String(record.age));
+                showToast(`Age updated to ${record.age}`);
+              }}
+            >
+              Save
+            </button>
+          </div>
         </div>
         <div className="setting-row">
           <div className="setting-info">

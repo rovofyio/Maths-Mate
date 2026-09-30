@@ -323,14 +323,8 @@ function getBonusDmg(elapsedSec: number): number {
   if (elapsedSec < 17) return 1;
   return 0;
 }
-const AGE_KEY = "pvp-age";
-
 /* ── component ── */
 export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: Difficulty; onFinish: (i: ResultInput) => void; onExit?: () => void }) {
-  const [age, setAge] = useState<number | null>(() => {
-    try { const v = localStorage.getItem(AGE_KEY); return v ? parseInt(v, 10) : null; } catch { return null; }
-  });
-  const [ageInput, setAgeInput] = useState("14");
   const [selected, setSelected] = useState<LevelCfg | null>(null);
   const [phase, setPhase] = useState<"select" | "battle" | "victory" | "defeat">("select");
 
@@ -373,13 +367,6 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
     setFlash(null);
   };
 
-  const handleAgeSubmit = () => {
-    const n = parseInt(ageInput, 10);
-    if (Number.isNaN(n) || n < 1 || n > 99) return;
-    try { localStorage.setItem(AGE_KEY, String(n)); } catch {}
-    setAge(n);
-  };
-
   const handleExit = () => {
     if (onExit) onExit();
     else finish(false);
@@ -389,7 +376,7 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
     if (overRef.current) return;
     overRef.current = true;
     const s = statsRef.current;
-    // No level started yet (age gate / level select): exit directly
+    // No level started yet (level select): exit directly
     // instead of building a result from a null level.
     if (!selected) {
       if (onExit) {
@@ -543,63 +530,10 @@ export function PvpBattleGame({ onFinish, onExit }: { topicId: TopicId; diffId: 
     }, 750);
   };
 
-  /* ── age gate ── */
-  if (age !== null && (age < 12 || age > 18)) {
-    return (
-      <GameShell emoji="⚔️" name="Monster PvP" onQuit={handleExit}>
-        <div className="pvp-agegate">
-          <div className="pvp-age-emoji">🔒</div>
-          <h2>Age Restricted</h2>
-          <p className="muted">This battle arena is crafted for mathematicians aged <strong>12–18</strong> with calculus, surds, fractions and decimals.</p>
-          <p className="muted">Your age is <strong>{age}</strong>. You can't enter this arena.</p>
-          <div className="pvp-age-row">
-            <input
-              className="pvp-age-input"
-              type="number"
-              min={1}
-              max={99}
-              value={ageInput}
-              onInput={e => setAgeInput((e.target as HTMLInputElement).value)}
-              placeholder="Enter age"
-            />
-            <button className="btn-primary" onClick={handleAgeSubmit}>Update age</button>
-          </div>
-          <button className="btn-ghost" style={{ width: "100%" }} onClick={handleExit}>← Back to games</button>
-        </div>
-      </GameShell>
-    );
-  }
-
-  if (age === null) {
-    return (
-      <GameShell emoji="⚔️" name="Monster PvP" onQuit={handleExit}>
-        <div className="pvp-agegate">
-          <div className="pvp-age-emoji">⚔️</div>
-          <h2>Enter the Arena</h2>
-          <p className="muted">Monster PvP is for ages <strong>12–18</strong>. Calculus, surds, fractions and decimals await. Each answer deals damage: <b>correct 5</b> · <b>close 2</b> · <b>furthest 0</b>.</p>
-          <div className="pvp-age-row">
-            <input
-              className="pvp-age-input"
-              type="number"
-              min={1}
-              max={99}
-              value={ageInput}
-              onInput={e => setAgeInput((e.target as HTMLInputElement).value)}
-              placeholder="Your age"
-            />
-            <button className="btn-primary" onClick={handleAgeSubmit}>Enter Battle</button>
-          </div>
-          <p className="muted small">Your age is stored locally to enforce the arena restriction.</p>
-          <button className="btn-ghost" style={{ width: "100%" }} onClick={handleExit}>← Back to games</button>
-        </div>
-      </GameShell>
-    );
-  }
-
   /* ── level select ── */
   if (phase === "select" || !selected) {
     return (
-      <GameShell emoji="⚔️" name="Monster PvP" pills={[`Age ${age}`, "12-18 only"]} onQuit={handleExit}>
+      <GameShell emoji="⚔️" name="Monster PvP" onQuit={handleExit}>
         <div className="pvp-select">
           <p className="pvp-select-sub">Pokémon-style PvP: you vs monster. Answer maths to attack. <b>5 DMG = correct</b> · <b>2 DMG = close</b> · <b>0 DMG = furthest</b>. Beat the monster before it beats you!</p>
           <div className="pvp-level-grid">

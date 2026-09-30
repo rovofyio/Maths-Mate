@@ -1,14 +1,18 @@
 import { signal } from "@preact/signals";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { lazy, Suspense } from "preact/compat";
-import { state } from "./lib/store";
+import { state, updateSettings } from "./lib/store";
 import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
+import { startMusic, stopMusic } from "./lib/music";
 import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
 import { SupportModal } from "./components/SupportModal";
+import { SplashScreen } from "./components/SplashScreen";
 import { CookieConsent } from "./components/CookieConsent";
+import { AgeVerification } from "./components/AgeVerification";
 import { UpdateBanner } from "./components/UpdateBanner";
 import { hasConsented } from "./lib/consent";
+import { hasVerifiedAge } from "./lib/ageVerification";
 import type { Route } from "./types";
 
 // Code-split by tab so low-memory devices only parse/hold the JS for the
@@ -32,10 +36,23 @@ function Toast() {
   );
 }
 
+// Unity-style boot splash duration (ms). Keep in sync with the splash
+// keyframes in styles.css — total sequence must stay at most 1.5s.
+const SPLASH_MS = 1500;
+
 export function App() {
   const route = activeRoute.value;
   const s = state.value;
   const [showSupport, setShowSupport] = useState(false);
+  // Boot splash on every launch (not first-run only).
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowSplash(false), SPLASH_MS);
+    return () => clearTimeout(t);
+  }, []);
+  // First-run only: age check shows once and never again automatically.
+  const [showAgeGate, setShowAgeGate] = useState(() => !hasVerifiedAge());
   // First-run only: show the cookie popup once, never again automatically.
   const [showCookie, setShowCookie] = useState(() => !hasConsented());
 
@@ -43,8 +60,8 @@ export function App() {
     { name: "games" as const, label: "Games", icon: "🎮" },
     { name: "learn" as const, label: "Learn", icon: "📚" },
     { name: "daily" as const, label: "Daily", icon: "🎡" },
-    { name: "profile" as const, label: "Profile", icon: "👤" },
     { name: "shop" as const, label: "Shop", icon: "💎" },
+    { name: "profile" as const, label: "Profile", icon: "👤" },
     { name: "settings" as const, label: "Settings", icon: "⚙️" },
   ];
 
@@ -56,7 +73,23 @@ export function App() {
             <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo" draggable={false} />
           </div>
 <div className="topbar-stats">
-               <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
+                <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
+                <button
+                  type="button"
+                  className="stat-chip"
+                  title={s.settings.music ? "Mute volume" : "Unmute volume"}
+                  aria-label={s.settings.music ? "Mute volume" : "Unmute volume"}
+                  aria-pressed={!s.settings.music}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    const next = !s.settings.music;
+                    updateSettings({ music: next, sound: next });
+                    if (next) startMusic();
+                    else stopMusic();
+                  }}
+                >
+                  {s.settings.music ? "🔊" : "🔇"}
+                </button>
                <div className="stat-chip" title="Coins">
                  🪙 {s.coins}
                </div>
@@ -94,7 +127,10 @@ export function App() {
       <Toast />
       <UpdateBanner />
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
-      {showCookie && <CookieConsent onDone={() => setShowCookie(false)} />}
+      {/* Boot splash first, then first-run modals (age gate above cookie). */}
+      {showSplash && <SplashScreen />}
+      {!showSplash && showAgeGate && <AgeVerification onDone={() => setShowAgeGate(false)} />}
+      {!showSplash && !showAgeGate && showCookie && <CookieConsent onDone={() => setShowCookie(false)} />}
     </div>
   );
 }

@@ -15,7 +15,9 @@ function powerSaverOn(): boolean {
 function ensureAudio(): HTMLAudioElement | null {
   if (!audio) {
     try {
-      audio = new Audio("audio/MenuMusic.mp3");
+      // Relative path so it resolves under both Vite dev ("/") and the
+      // Capacitor WebView (https://localhost with base "./").
+      audio = new Audio("./audio/MenuMusic.mp3");
       audio.loop = true;
       // Low-power devices: don't fetch/decode audio until playback is
       // actually requested — saves memory, CPU and mobile data.

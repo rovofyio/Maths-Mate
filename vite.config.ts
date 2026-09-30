@@ -3,6 +3,10 @@ import preact from "@preact/preset-vite";
 
 export default defineConfig({
   plugins: [preact()],
+  // Relative base is required for Capacitor: the WebView serves from
+  // https://localhost (Android) or capacitor://localhost (iOS), and an
+  // absolute "/" base breaks asset URLs on some devices/schemes.
+  base: "./",
   server: {
     port: 5173,
     host: true,

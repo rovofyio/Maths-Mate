@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./web-DO560lth.js","./index-KB_plx0g.js","./vendor-B10nirLk.js","./index-CpFIf2s2.css"])))=>i.map(i=>d[i]);
+import{S as e,y as t}from"./index-KB_plx0g.js";var n;(function(e){e[e.Flush=0]=`Flush`,e[e.Add=1]=`Add`})(n||={});var r=e(`TextToSpeech`,{web:()=>t(()=>import(`./web-DO560lth.js`).then(e=>new e.TextToSpeechWeb),__vite__mapDeps([0,1,2,3]),import.meta.url)});`speechSynthesis`in window&&window.speechSynthesis;export{n as QueueStrategy,r as TextToSpeech};
