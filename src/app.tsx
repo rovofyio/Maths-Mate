@@ -73,7 +73,7 @@ export function App() {
             <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo" draggable={false} />
           </div>
 <div className="topbar-stats">
-                <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
+                <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" aria-label="Support Math Aura" style={{ cursor: "pointer" }}>💎</a>
                 <button
                   type="button"
                   className="stat-chip"
