@@ -6,6 +6,7 @@ import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
 import { startMusic, stopMusic } from "./lib/music";
 import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
+import auraMobileLogoUrl from "../Pictures/Aura.png";
 import { SupportModal } from "./components/SupportModal";
 import { SplashScreen } from "./components/SplashScreen";
 import { CookieConsent } from "./components/CookieConsent";
@@ -70,10 +71,11 @@ export function App() {
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">
-            <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo" draggable={false} />
+            <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo brand-logo-desktop" draggable={false} />
+            <img src={auraMobileLogoUrl} alt="Aura" className="brand-logo brand-logo-mobile" draggable={false} />
           </div>
 <div className="topbar-stats">
-                <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" aria-label="Support Math Aura" style={{ cursor: "pointer" }}>💎</a>
+                <a className="stat-chip stat-chip--compact" onClick={() => setShowSupport(true)} title="Support Math Aura" aria-label="Support Math Aura" style={{ cursor: "pointer" }}>💎</a>
                 <button
                   type="button"
                   className="stat-chip"
@@ -90,10 +92,10 @@ export function App() {
                 >
                   {s.settings.music ? "🔊" : "🔇"}
                 </button>
-               <div className="stat-chip" title="Coins">
-                 🪙 {s.coins}
-               </div>
-            <div className="stat-chip" title="Experience">
+               <div className="stat-chip stat-chip--compact" title="Coins">
+                  🪙 {s.coins}
+                </div>
+            <div className="stat-chip stat-chip--compact" title="Experience">
               ⭐ {s.xp}
             </div>
             <div className="stat-chip" title="Level">
