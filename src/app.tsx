@@ -5,7 +5,7 @@ import { state, updateSettings } from "./lib/store";
 import { levelForXp } from "./lib/storage";
 import { toastSignal } from "./lib/toast";
 import { startMusic, stopMusic } from "./lib/music";
-import auraLogoUrl from "../Pictures/AuraWithNameCropped.png";
+import auraLogoUrl from "../Pictures/Aura.png";
 import { SupportModal } from "./components/SupportModal";
 import { SplashScreen } from "./components/SplashScreen";
 import { CookieConsent } from "./components/CookieConsent";
@@ -70,7 +70,7 @@ export function App() {
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">
-            <img src={auraLogoUrl} alt="Maths Aura" className="brand-logo" draggable={false} />
+            <img src={auraLogoUrl} alt="Aura" className="brand-logo" draggable={false} />
           </div>
 <div className="topbar-stats">
                 <a className="stat-chip" onClick={() => setShowSupport(true)} title="Support Math Aura" style={{ cursor: "pointer" }}>💎 Support</a>
