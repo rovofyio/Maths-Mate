@@ -19,11 +19,11 @@
   "dependencies": {
     "@capacitor-community/admob": "^8.1.0",
     "@capacitor-community/text-to-speech": "^8.0.2",
-    "@capacitor/app": "^8.1.1",
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.2",
     "@capawesome/capacitor-app-update": "^8.0.5",
-    "@preact/signals": "^2.11.1",
-    "@revenuecat/purchases-capacitor": "^13.5.1",
+    "@preact/signals": "^2.11.3",
+    "@revenuecat/purchases-capacitor": "^13.7.0",
     "preact": "^10.29.8"
   },
   "devDependencies": {
@@ -33,10 +33,10 @@
     "@preact/preset-vite": "^2.10.6",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/preact": "^3.2.4",
-    "@types/node": "^26.4.0",
+    "@types/node": "^26.6.4",
     "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
-    "vite": "^8.2.2",
+    "vite": "^8.3.2",
     "vitest": "^4.1.11"
   }
 }
