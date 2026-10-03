@@ -5,9 +5,9 @@ node_modules/
 dist/
 build/
 
-# Capacitor native projects (regenerate with cap add)
-android/
-ios/
+# Capacitor native projects (tracked: regen with cap add/sync, then commit)
+# android/
+# ios/
 .capacitor/
 
 # Env
@@ -34,6 +34,7 @@ pnpm-debug.log*
 
 # Vite
 .vite/
+vite.config.ts.timestamp-*.mjs
 
 # Misc
 opencode
