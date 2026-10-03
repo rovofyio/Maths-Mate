@@ -4,9 +4,14 @@ const config: CapacitorConfig = {
   appId: "io.rovofy.mathsaura",
   appName: "Math Aura",
   webDir: "dist",
-  // Use https scheme for Android (required for Play Store) and allow mixed content for audio/assets
+  // Default http scheme: Capacitor serves bundled files locally via
+  // http://localhost (loopback — exempt from cleartext bans and treated as
+  // a secure context). The https scheme breaks startup with
+  // net::ERR_CONNECTION_REFUSED on older System WebViews / emulator images,
+  // and Play Store does not require the *local* WebView origin to be https
+  // (it only cares about targetSdk + real network traffic, which stays https).
   server: {
-    androidScheme: "https",
+    androidScheme: "http",
   },
   android: {
     allowMixedContent: true,
