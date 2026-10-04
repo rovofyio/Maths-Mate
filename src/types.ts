@@ -87,4 +87,6 @@ export interface GameMeta {
   free: boolean;
   tag?: string;
   bestFor?: string;
+  /** When true, hide from GameHome/Shop listings but keep playable via gameId (WIP games). */
+  hidden?: boolean;
 }

@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import type { CSSProperties } from "preact";
-import { GAMES, getGame } from "../games";
+import { VISIBLE_GAMES, getGame } from "../games";
 import { gameUnlocked } from "../lib/iap";
 import { GameSession } from "../components/GameSession";
 import { UnlockGameModal } from "../components/UnlockGameModal";
@@ -18,7 +18,7 @@ export function GameHome() {
   return (
     <div className="page">
       <div className="game-grid">
-        {GAMES.map((g) => {
+        {VISIBLE_GAMES.map((g) => {
           const unlocked = gameUnlocked(g);
           return (
             <button

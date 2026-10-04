@@ -22,7 +22,7 @@ function ensureAudio(): HTMLAudioElement | null {
       // Low-power devices: don't fetch/decode audio until playback is
       // actually requested — saves memory, CPU and mobile data.
       audio.preload = powerSaverOn() ? "none" : "auto";
-      audio.volume = 0.45;
+      audio.volume = 0.2;
     } catch {
       return null;
     }

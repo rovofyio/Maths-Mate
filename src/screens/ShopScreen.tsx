@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { GAMES } from "../games";
+import { VISIBLE_GAMES } from "../games";
 import { COIN_PACKS, STAR_PACKS, PRODUCTS, gameUnlocked, purchaseProduct, hasPurchase } from "../lib/iap";
 import type { ProductId } from "../lib/iap";
 import { addCoins, addXp, state, unlockGame } from "../lib/store";
@@ -80,7 +80,7 @@ export function ShopScreen() {
       <h2 className="section-title">🎮 Games — unlock individually</h2>
       <p className="muted small">Unlock each premium game for 🪙 {GAME_PRICE} coins.</p>
       <div className="paywall-products">
-        {GAMES.map((g) => {
+        {VISIBLE_GAMES.map((g) => {
           const unlocked = gameUnlocked(g);
           return (
             <div key={g.id} className={`product-card ${unlocked ? "owned" : ""}`}>

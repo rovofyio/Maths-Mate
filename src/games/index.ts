@@ -2,7 +2,8 @@ import type { GameMeta } from "../types";
 
 export const GAMES: GameMeta[] = [
   { id: "racing", name: "Math Racing", emoji: "🏎️", color: "#e74c3c", blurb: "Answer fast to zoom your car past the rival.", ages: [6, 18], free: true, tag: "Fast · 8 answers" },
-  { id: "tower", name: "Tower Defence", emoji: "🏰", color: "#6c5ce7", blurb: "Correct answers fire bolts and power up your tower.", ages: [6, 18], free: true, tag: "Strategic · 5 waves" },
+  // Hidden (WIP): kept in the games folder but not shown on the homescreen.
+  { id: "tower", name: "Tower Defence", emoji: "🏰", color: "#6c5ce7", blurb: "Correct answers fire bolts and power up your tower.", ages: [6, 18], free: true, tag: "Strategic · 5 waves", hidden: true },
   { id: "bomb", name: "Bomb Defusal", emoji: "💣", color: "#e74c3c", blurb: "Defuse the bomb by answering math questions correctly.", ages: [6, 18], free: true, tag: "Defuse · 10 questions" },
   { id: "fastmath", name: "Fast Math", emoji: "⏱️", color: "#f39c12", blurb: "How many questions can you solve in 60 seconds?", ages: [7, 18], free: false, tag: "Race the clock" },
   { id: "maze", name: "Maths Maze", emoji: "🧩", color: "#1abc9c", blurb: "Navigate the maze by answering maths questions.", ages: [6, 15], free: false, tag: "Puzzle · 5 levels" },
@@ -16,4 +17,7 @@ export function getGame(id: string): GameMeta {
   return GAMES.find((g) => g.id === id) ?? GAMES[0];
 }
 
-export const FREE_GAMES = GAMES.filter((g) => g.free).length;
+export const FREE_GAMES = GAMES.filter((g) => g.free && !g.hidden).length;
+
+/** Games visible on the homescreen/shop. Hidden (WIP) games stay importable via getGame/GameSession. */
+export const VISIBLE_GAMES = GAMES.filter((g) => !g.hidden);
