@@ -1,7 +1,7 @@
 {
   "name": "maths-mate",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Math Aura — a kid-friendly maths game app with 10 games, coins, daily spinner, achievements and a leaderboard.",
   "type": "module",
   "scripts": {
@@ -24,7 +24,7 @@
     "@capawesome/capacitor-app-update": "^8.0.5",
     "@preact/signals": "^2.11.3",
     "@revenuecat/purchases-capacitor": "^13.7.0",
-    "preact": "^10.29.8"
+    "preact": "^11.0.0"
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.2",
@@ -37,6 +37,6 @@
     "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.3"
   }
 }

@@ -1,10 +1,10 @@
-import type { JSX } from "preact";
+import type { CSSProperties } from "preact";
 import car1Url from "../../Pictures/Car1.png";
 import car2Url from "../../Pictures/Car2.png";
 
 interface CarProps {
   className?: string;
-  style?: JSX.CSSProperties;
+  style?: CSSProperties;
 }
 
 /**
