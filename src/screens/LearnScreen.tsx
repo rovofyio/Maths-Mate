@@ -16,13 +16,24 @@ type LessonPhase = "flashcards" | "quiz" | "done";
 
 /* ── Flashcards ── */
 function FlashcardDeck({ lessonId, chapterId, onDone }: { lessonId: string; chapterId: string; onDone: () => void }) {
-  const lesson = getLesson(chapterId, lessonId)!;
-  const cards = useMemo(() => getFlashcardsForLesson(lesson), [lessonId]);
+  const lesson = getLesson(chapterId, lessonId);
+  const cards = useMemo(() => (lesson ? getFlashcardsForLesson(lesson) : []), [lessonId]);
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<Set<number>>(new Set());
   const total = cards.length;
-  const cur = cards[idx];
+  // Defensive: a lesson with no key points/examples would otherwise crash
+  // on `cards[idx].frontHint`. Go straight to the quiz instead of hanging.
+  if (total === 0) {
+    return (
+      <div className="fc-wrap">
+        <p className="muted">No flashcards for this lesson yet.</p>
+        <button className="btn-primary big fc-go-quiz" onClick={onDone}>Go to Quiz →</button>
+      </div>
+    );
+  }
+  const safeIdx = Math.min(idx, total - 1);
+  const cur = cards[safeIdx];
   const progress = ((idx + 1) / total) * 100;
 
   const next = () => {
@@ -89,8 +100,8 @@ function FlashcardDeck({ lessonId, chapterId, onDone }: { lessonId: string; chap
 
 /* ── Duolingo quiz ── */
 function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; chapterId: string; onFinish: (correct: number, total: number) => void }) {
-  const lesson = getLesson(chapterId, lessonId)!;
-  const questions = useMemo(() => getQuizForLesson(lesson, 5), [lessonId]);
+  const lesson = getLesson(chapterId, lessonId);
+  const questions = useMemo(() => (lesson ? getQuizForLesson(lesson, 5) : []), [lessonId]);
   const [i, setI] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -98,7 +109,23 @@ function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; cha
   const [hearts, setHearts] = useState(3);
   const [streak, setStreak] = useState(0);
   const total = questions.length;
-  const q: QuizQ = questions[i];
+  // Defensive: never crash on an empty question list (getQuizForLesson
+  // always returns `count` items, but guard anyway so a bad lesson can't
+  // white-screen the app). Offer a safe way back to flashcards.
+  if (total === 0) {
+    return (
+      <div className="duo-wrap">
+        <div className="duo-result">
+          <div className="duo-res-emoji">📚</div>
+          <h3>No questions available</h3>
+          <p className="muted">This lesson has no quiz questions yet. Please review the flashcards.</p>
+          <button className="btn-primary big" onClick={() => onFinish(0, 0)}>Back to flashcards</button>
+        </div>
+      </div>
+    );
+  }
+  const safeI = Math.min(i, total - 1);
+  const q: QuizQ = questions[safeI];
   const progress = ((i) / total) * 100;
   const isCorrect = selected === q.answer;
 
@@ -154,14 +181,14 @@ function DuolingoQuiz({ lessonId, chapterId, onFinish }: { lessonId: string; cha
       </div>
 
       <div className="duo-options">
-        {q.options.map(opt => {
+        {q.options.map((opt, oi) => {
           let cls = "duo-opt";
           if (checked) {
             if (opt === q.answer) cls += " correct";
             else if (opt === selected) cls += " wrong";
           } else if (opt === selected) cls += " selected";
           return (
-            <button key={opt} className={cls} disabled={checked} onClick={() => setSelected(opt)}>
+            <button key={`${opt}-${oi}`} className={cls} disabled={checked} onClick={() => setSelected(opt)}>
               {opt}
             </button>
           );
@@ -195,9 +222,16 @@ export function LearnScreen() {
   if (view.kind === "lesson") {
     const chapter = getChapter(view.chapterId);
     const lesson = getLesson(view.chapterId, view.lessonId);
+    // Defensive: a stale/unknown lesson id must never crash or hang the
+    // app. Show a safe fallback instead of calling setState during render.
     if (!chapter || !lesson) {
-      setView({ kind: "home" });
-      return null;
+      return (
+        <div className="page">
+          <h1 className="page-title">📚 Lesson not found</h1>
+          <p className="page-sub">That lesson doesn't exist (it may have been renamed).</p>
+          <button className="btn-primary big" onClick={() => setView({ kind: "home" })}>← Back to chapters</button>
+        </div>
+      );
     }
     const done = s.lessonsCompleted.includes(lesson.id);
     const flashcards = getFlashcardsForLesson(lesson);
@@ -267,7 +301,16 @@ export function LearnScreen() {
 
   if (view.kind === "chapter") {
     const chapter = getChapter(view.chapterId);
-    if (!chapter) { setView({ kind: "home" }); return null; }
+    // Defensive: same as above — never setState during render.
+    if (!chapter) {
+      return (
+        <div className="page">
+          <h1 className="page-title">📚 Chapter not found</h1>
+          <p className="page-sub">That chapter doesn't exist.</p>
+          <button className="btn-primary big" onClick={() => setView({ kind: "home" })}>← All chapters</button>
+        </div>
+      );
+    }
     return (
       <div className="page">
         <button className="back-btn" onClick={() => setView({ kind: "home" })}>← All chapters</button>

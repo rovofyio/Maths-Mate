@@ -40,6 +40,18 @@ export function GameSession({ gameId, onExit }: { gameId: string; onExit: () => 
 
   const Game = COMPONENTS[gameId];
 
+  // Defensive: an unknown/hidden game id must show a safe fallback,
+  // never crash with "Element type is invalid" (undefined component).
+  if (!Game) {
+    return (
+      <div className="page">
+        <h1 className="page-title">🎮 Game not found</h1>
+        <p className="page-sub">That game isn't available on this version.</p>
+        <button className="btn-primary big" onClick={onExit}>← Back to games</button>
+      </div>
+    );
+  }
+
   // Maze and Monster PvP have their own level selection with built-in
   // topics, so skip the shared topic/difficulty picker for them.
   const SKIP_CONFIG = ["maze", "pvp"];

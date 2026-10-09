@@ -219,10 +219,17 @@ function makeQsForLevel(levelId: number): PvpQ {
   // ensure formatting doesn't duplicate due to rounding
   // de-duplicate by string
   const uniq = Array.from(new Set(opts.map(v => parseFloat(v.toFixed(3))))) as number[];
-  // if duplicates collapsed, refill
-  while (uniq.length < 3) {
+  // if duplicates collapsed, refill (bounded: random retries, then
+  // deterministic padding, so this can never spin forever)
+  let refillGuard = 0;
+  while (uniq.length < 3 && refillGuard++ < 50) {
     const extra = base.answer + ri(-5, 5) + (Number.isInteger(base.answer) ? 0 : 0.5);
     if (!uniq.includes(extra)) uniq.push(parseFloat(extra.toFixed(2)));
+  }
+  let pad = 7;
+  while (uniq.length < 3) {
+    const f = parseFloat((base.answer + pad++).toFixed(2));
+    if (!uniq.includes(f)) uniq.push(f);
   }
   let finalOpts = shuffle(uniq.slice(0, 3));
   // ensure answer present

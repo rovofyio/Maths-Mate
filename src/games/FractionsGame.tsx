@@ -17,15 +17,25 @@ function simpleFrac(n: number, d: number): string {
   return `${n / g}/${d / g}`;
 }
 
-function genRound() {
+export function genRound() {
   const d = DENOMS[Math.floor(Math.random() * DENOMS.length)];
   const n = 1 + Math.floor(Math.random() * (d - 1));
   const correct = simpleFrac(n, d);
   const options = new Set<string>([correct]);
-  while (options.size < 4) {
-    const cand = simpleFrac(1 + Math.floor(Math.random() * (d - 1)), d);
-    options.add(cand);
+  // NOTE: small denominators only have a few distinct simplified fractions
+  // (d=2 → just "1/2", d=3 → 2 options, d=4 → 3 options), so sampling only
+  // from the same denominator hung forever here. Sample across all
+  // denominators (plus unsimplified near-misses) with a bounded guard.
+  let guard = 0;
+  while (options.size < 4 && guard++ < 200) {
+    const dd = DENOMS[Math.floor(Math.random() * DENOMS.length)];
+    const nn = 1 + Math.floor(Math.random() * (dd - 1));
+    options.add(simpleFrac(nn, dd));
+    if (options.size < 4) options.add(`${nn}/${dd}`);
   }
+  // Absolute fallback with unique strings — can never hang.
+  let f = 1;
+  while (options.size < 4) options.add(`${n + f}/${d + f++}`);
   return { n, d, correct, options: [...options] };
 }
 

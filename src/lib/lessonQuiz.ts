@@ -26,7 +26,11 @@ function distractorsText(ans: string, pool: string[]): string[] {
   const set = new Set<string>([ans]);
   const shuffled = shuffle(pool.filter(p=>p!==ans));
   for(const p of shuffled){ if(set.size>=4) break; set.add(p); }
-  while(set.size<4) set.add(ans+" (alt)");
+  // Padding must use a unique suffix per item — adding the same string
+  // repeatedly never grows the Set and hangs forever (same freeze symptom
+  // as the quiz loop when the pool has < 3 alternatives, e.g. True/False).
+  let n = 2;
+  while(set.size<4) set.add(`${ans} (alt ${n++})`);
   return shuffle([...set]);
 }
 function mkQ(prompt: string, answer: string|number, opts?: string[], exp?: string, figure?: QuizFigure): QuizQ {
@@ -490,16 +494,32 @@ export function getQuizForLesson(lesson: Lesson, count=5): QuizQ[] {
     }
     qs.push({ id: Math.random().toString(36).slice(2,7), prompt: ex.q, options: shuffle(opts.includes(ans)?opts:[ans, ...opts.slice(0,3)]), answer: ans, explanation: ex.s.join(" "), figure: defaultFigureFor(lesson.id) });
   }
-  while(qs.length<count){
+  // NOTE: several lessons only have 1–3 distinct generated prompts
+  // (e.g. stats-graphs, stats-probability). The old code required every
+  // prompt to be unique, so `getQuizForLesson` looped forever and the UI
+  // thread hung ("stops responding") when opening those quizzes.
+  // Fix: bound the attempts and accept a repeat prompt rather than hanging.
+  let attempts = 0;
+  const MAX_ATTEMPTS = 60;
+  while(qs.length<count && attempts<MAX_ATTEMPTS){
+    attempts++;
     if(g){
       const q=g();
-      // avoid duplicate prompts
-      if(!qs.find(x=>x.prompt===q.prompt)) qs.push(q);
+      // avoid duplicate prompts while variety remains; otherwise accept
+      // the repeat so the quiz always opens instead of hanging.
+      if(!qs.find(x=>x.prompt===q.prompt) || attempts>20) qs.push(q);
     } else {
       // fallback generic true/false from keyPoint
-      const kp = pick(lesson.keyPoints);
-      qs.push(mkQ(`True or False: ${kp}`, "True", distractorsText("True",["True","False"]), kp));
+      const kp = pick(lesson.keyPoints.length ? lesson.keyPoints : ["Maths is fun"]);
+      const q = mkQ(`True or False: ${kp}`, "True", distractorsText("True",["True","False"]), kp);
+      if(!qs.find(x=>x.prompt===q.prompt) || attempts>20) qs.push(q);
     }
+  }
+  // Absolute safety net: never return fewer than requested / empty.
+  while(qs.length<count){
+    const fallback = qs[0];
+    if(!fallback) break;
+    qs.push({ ...fallback, id: Math.random().toString(36).slice(2,7) });
   }
   return shuffle(qs).slice(0,count);
 }
